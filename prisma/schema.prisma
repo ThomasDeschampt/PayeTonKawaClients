@@ -7,11 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  client
+  admin
+}
+
 model Addresses {
   id          Int      @id @default(autoincrement())
   created_at  DateTime @default(now()) @db.Timestamptz(6)
   code_postal Int
   adresse     String   @db.VarChar()
+  complement  String?  @db.VarChar()
   client_id   String
   
   // Relation avec la table Clients
@@ -25,6 +31,7 @@ model Entreprises {
   id             Int      @id @default(autoincrement())
   created_at     DateTime @default(now()) @db.Timestamptz(6)
   nom_entreprise String   @db.VarChar()
+  siret          String   @db.VarChar()
   id_client      String
   
   // Relation avec la table Clients
@@ -40,7 +47,11 @@ model Clients {
   nom        String   @db.VarChar()
   prenom     String   @db.VarChar()
   pseudo     String   @db.VarChar()
+  mot_de_passe String   @db.VarChar()
   mail       String   @db.VarChar()
+  telephone  String   @db.VarChar()
+  date_naissance DateTime @db.Timestamptz(6)
+  role       Role     @default(client)
   
   // Relations
   addresses   Addresses[]
