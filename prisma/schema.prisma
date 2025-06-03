@@ -7,55 +7,65 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  client
-  admin
+model Role {
+  id     Int      @id @default(autoincrement())
+  name   String   @unique @db.VarChar()
+
+  clients Client[]
+
+  @@map("roles")
 }
 
-model Addresses {
+model Client {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  pseudo       String   @unique @db.VarChar()
+  motDePasse   String   @db.VarChar()
+  roleId       Int
+
+  // Relations
+  role         Role     @relation(fields: [roleId], references: [id])
+  entreprise   EntrepriseDetails?
+  personne     PersonneDetails?
+  addresses    Address[]
+
+  @@map("clients")
+}
+
+model Address {
   id          Int      @id @default(autoincrement())
-  created_at  DateTime @default(now()) @db.Timestamptz(6)
-  code_postal Int
+  codePostal  Int
   adresse     String   @db.VarChar()
   complement  String?  @db.VarChar()
-  client_id   String
-  
-  // Relation avec la table Clients
-  client      Clients  @relation(fields: [client_id], references: [id])
-  
-  @@index([client_id])
+  clientId    String
+
+  client      Client   @relation(fields: [clientId], references: [id])
+
+  @@index([clientId])
   @@map("addresses")
 }
 
-model Entreprises {
+model EntrepriseDetails {
   id             Int      @id @default(autoincrement())
-  created_at     DateTime @default(now()) @db.Timestamptz(6)
-  nom_entreprise String   @db.VarChar()
-  siret          String   @db.VarChar()
-  id_client      String
-  
-  // Relation avec la table Clients
-  client         Clients  @relation(fields: [id_client], references: [id])
-  
-  @@index([id_client])
-  @@map("entreprises")
+  nomEntreprise  String   @db.VarChar()
+  siret          String   @unique @db.VarChar()
+  clientId       String   @unique
+
+  client         Client   @relation(fields: [clientId], references: [id])
+
+  @@map("entreprise_details")
 }
 
-model Clients {
-  id         String   @id @default(uuid())
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  nom        String   @db.VarChar()
-  prenom     String   @db.VarChar()
-  pseudo     String   @db.VarChar()
-  mot_de_passe String   @db.VarChar()
-  mail       String   @db.VarChar()
-  telephone  String   @db.VarChar()
-  date_naissance DateTime @db.Timestamptz(6)
-  role       Role     @default(client)
-  
-  // Relations
-  addresses   Addresses[]
-  entreprises Entreprises[]
-  
-  @@map("clients")
+model PersonneDetails {
+  id             Int      @id @default(autoincrement())
+  nom            String   @db.VarChar()
+  prenom         String   @db.VarChar()
+  mail           String   @unique @db.VarChar()
+  telephone      String   @db.VarChar()
+  dateNaissance  DateTime @db.Timestamptz(6)
+  clientId       String   @unique
+
+  client         Client   @relation(fields: [clientId], references: [id])
+
+  @@map("personne_details")
 }
