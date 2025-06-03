@@ -34,7 +34,6 @@ model Client {
 
 model Address {
   id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now()) @db.Timestamptz(6)
   codePostal  Int
   adresse     String   @db.VarChar()
   complement  String?  @db.VarChar()
@@ -48,7 +47,6 @@ model Address {
 
 model EntrepriseDetails {
   id             Int      @id @default(autoincrement())
-  createdAt      DateTime @default(now()) @db.Timestamptz(6)
   nomEntreprise  String   @db.VarChar()
   siret          String   @unique @db.VarChar()
   clientId       String   @unique
@@ -60,7 +58,6 @@ model EntrepriseDetails {
 
 model PersonneDetails {
   id             Int      @id @default(autoincrement())
-  createdAt      DateTime @default(now()) @db.Timestamptz(6)
   nom            String   @db.VarChar()
   prenom         String   @db.VarChar()
   mail           String   @unique @db.VarChar()
