@@ -1,11 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const authorized = require('../middleware/auth');
+const authorized = require("../middleware/auth");
 
 //controllers de clients
-const afficherAll = require('../controllers/clients/afficherAll');
+const ajouter = require("../controllers/clients/ajouter");
+const afficherAll = require("../controllers/clients/afficherAll");
 
-router.get('/afficherAll', authorized, afficherAll);
+router.post("/ajouter", authorized, ajouter);
+router.get("/afficherAll", authorized, afficherAll);
 
 module.exports = router;
