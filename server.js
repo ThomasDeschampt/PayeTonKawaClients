@@ -1,8 +1,8 @@
-const express = require('express');
-const cors = require('cors');
-const setupSwagger = require('./swagger');
-const { PrismaClient } = require('@prisma/client');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+const setupSwagger = require("./swagger");
+const { PrismaClient } = require("@prisma/client");
+require("dotenv").config();
 
 const app = express();
 const prisma = new PrismaClient();
@@ -14,10 +14,10 @@ app.use("/api/clients", require("./routes/clients"));
 
 setupSwagger(app);
 
-app.use('*', (req, res) => {
+app.use("*", (req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Route non trouvée'
+    message: "Route non trouvée",
   });
 });
 
@@ -25,23 +25,18 @@ app.listen(PORT, () => {
   console.log(`Serveur démarré sur le port ${PORT}`);
   console.log(`API disponible sur http://localhost:${PORT}/api`);
 
-  const jwt = require('jsonwebtoken');
+  const jwt = require("jsonwebtoken");
 
   //temporaire
-  const token = jwt.sign(
-    { username: 'testuser' },
-    process.env.JWT_SECRET,
-    { expiresIn: '1h' }
-  );
+  const token = jwt.sign({ username: "testuser" }, process.env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
 
   console.log(token);
-
-
 });
 
-process.on('SIGINT', async () => {
-  console.log('Arrêt du serveur...');
+process.on("SIGINT", async () => {
+  console.log("Arrêt du serveur...");
   await prisma.$disconnect();
   process.exit(0);
 });
-
