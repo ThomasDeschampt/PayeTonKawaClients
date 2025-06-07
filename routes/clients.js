@@ -8,10 +8,12 @@ const ajouter = require("../controllers/clients/ajouter");
 const afficher = require("../controllers/clients/afficher.js");
 const afficherAll = require("../controllers/clients/afficherAll");
 const modifier = require("../controllers/clients/modifier");
+const supprimer = require("../controllers/clients/supprimer");
 
 router.post("/ajouter", authorized, ajouter);
 router.get("/afficher/:uuid", authorized, afficher);
 router.get("/afficherAll", authorized, afficherAll);
 router.put("/modifier/:uuid", authorized, modifier);
+router.delete("/supprimer/:uuid", authorized, supprimer);
 
 module.exports = router;
