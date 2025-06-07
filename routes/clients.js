@@ -5,7 +5,7 @@ const authorized = require("../middleware/auth");
 
 //controllers de clients
 const ajouter = require("../controllers/clients/ajouter");
-router.get("/afficher/:uuid", authorized, afficher);
+const afficher = require("../controllers/clients/afficher.js");
 const afficherAll = require("../controllers/clients/afficherAll");
 
 router.post("/ajouter", authorized, ajouter);

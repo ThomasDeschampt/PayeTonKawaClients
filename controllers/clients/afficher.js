@@ -1,42 +1,25 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// Afficher un client par ID (UUID)
-const afficher = async (req, res) => {
+const afficherAll = async (req, res) => {
+  console.log("Afficher tous les clients avec jointures", req);
   try {
-    const { uuid } = req.params;
-    console.log("UUID du client à afficher:", uuid);
-
-    // Validation UUID
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(uuid)) {
-      return res.status(400).json({
-        success: false,
-        message: "UUID invalide",
-      });
-    }
-
-    const client = await prisma.client.findUnique({
-      where: { id: uuid },
+    const clients = await prisma.client.findMany({
       include: {
-        role: true,
         addresses: true,
         entreprise: true,
         personne: true,
+        role: true,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
-    if (!client) {
-      return res.status(404).json({
-        success: false,
-        message: "Client non trouvé",
-      });
-    }
-
     res.json({
       success: true,
-      data: client,
+      data: clients,
+      count: clients.length,
     });
   } catch (error) {
     console.error("Erreur:", error);
@@ -47,4 +30,4 @@ const afficher = async (req, res) => {
   }
 };
 
-module.exports = afficher;
+module.exports = afficherAll;
