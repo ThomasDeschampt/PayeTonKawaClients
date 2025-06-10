@@ -71,3 +71,12 @@ exports.updateClient = async (id, { pseudo, motDePasse, roleId }) => {
     data: dataToUpdate,
   });
 };
+
+exports.deleteClient = async (id) => {
+  // Supprimer les données liées avant de supprimer le client
+  await prisma.address.deleteMany({ where: { clientId: id } });
+  await prisma.entrepriseDetails.deleteMany({ where: { clientId: id } });
+  await prisma.personneDetails.deleteMany({ where: { clientId: id } });
+
+  return await prisma.client.delete({ where: { id } });
+};

@@ -103,4 +103,32 @@ exports.modifier = async (req, res) => {
   }
 };
 
+exports.supprimer = async (req, res) => {
+  try {
+    const { uuid } = req.params;
+
+    // Vérifier que le client existe
+    const clientExistant = await clientsService.getClientById(uuid);
+    if (!clientExistant) {
+      return res.status(404).json({
+        success: false,
+        message: "Client non trouvé",
+      });
+    }
+
+    await clientsService.deleteClient(uuid);
+
+    res.json({
+      success: true,
+      message: "Client et données liées supprimés avec succès",
+    });
+  } catch (error) {
+    console.error("Erreur:", error);
+    res.status(500).json({
+      success: false,
+      message: "Erreur serveur",
+    });
+  }
+};
+
 

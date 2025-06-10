@@ -10,6 +10,6 @@ router.get("/afficher/:uuid", authorized, validateUUID, clientsController.affich
 router.get("/afficherAll", authorized, clientsController.afficherAll);
 router.post("/ajouter", authorized, clientsController.ajouter);
 router.put("/modifier/:uuid", authorized, validateUUID, clientsController.modifier);
-
+router.delete("/supprimer/:uuid", authorized, validateUUID, clientsController.supprimer);
 
 module.exports = router;
