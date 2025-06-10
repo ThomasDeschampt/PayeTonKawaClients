@@ -1,18 +1,9 @@
 const clientController = require("../../controllers/clientsController");
-const { PrismaClient } = require("@prisma/client");
+const clientsService = require("../../services/clientsService");
 
-jest.mock("@prisma/client", () => {
-  const mockPrisma = {
-    client: {
-      findUnique: jest.fn(),
-    },
-  };
-  return {
-    PrismaClient: jest.fn(() => mockPrisma),
-  };
-});
-
-const prisma = new PrismaClient();
+jest.mock("../../services/clientsService", () => ({
+  getClientById: jest.fn(),
+}));
 
 describe("afficher client", () => {
   let req, res;
@@ -36,20 +27,11 @@ describe("afficher client", () => {
     };
 
     req.params.uuid = fakeClient.id;
-    prisma.client.findUnique.mockResolvedValue(fakeClient);
+    clientsService.getClientById.mockResolvedValue(fakeClient);
 
     await clientController.afficher(req, res);
 
-    expect(prisma.client.findUnique).toHaveBeenCalledWith({
-      where: { id: fakeClient.id },
-      include: {
-        personne: true,
-        entreprise: true,
-        addresses: true,
-        role: true,
-      },
-    });
-
+    expect(clientsService.getClientById).toHaveBeenCalledWith(fakeClient.id);
     expect(res.json).toHaveBeenCalledWith({
       success: true,
       data: fakeClient,
@@ -58,10 +40,11 @@ describe("afficher client", () => {
 
   it("devrait retourner 404 si client non trouvé", async () => {
     req.params.uuid = "123e4567-e89b-12d3-a456-426614174000";
-    prisma.client.findUnique.mockResolvedValue(null);
+    clientsService.getClientById.mockResolvedValue(null);
 
     await clientController.afficher(req, res);
 
+    expect(clientsService.getClientById).toHaveBeenCalledWith(req.params.uuid);
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({
       success: false,
@@ -71,14 +54,20 @@ describe("afficher client", () => {
 
   it("devrait retourner 500 si erreur serveur", async () => {
     req.params.uuid = "123e4567-e89b-12d3-a456-426614174000";
-    prisma.client.findUnique.mockRejectedValue(new Error("DB fail"));
+    clientsService.getClientById.mockRejectedValue(new Error("DB fail"));
+
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation();
 
     await clientController.afficher(req, res);
 
+    expect(clientsService.getClientById).toHaveBeenCalledWith(req.params.uuid);
+    expect(consoleSpy).toHaveBeenCalledWith("Erreur:", expect.any(Error));
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
       success: false,
       message: "Erreur serveur",
     });
+
+    consoleSpy.mockRestore();
   });
 });
