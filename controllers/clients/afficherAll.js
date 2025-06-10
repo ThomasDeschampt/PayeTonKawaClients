@@ -2,7 +2,6 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const afficherAll = async (req, res) => {
-  console.log("Afficher tous les clients avec jointures", req);
   try {
     const clients = await prisma.client.findMany({
       include: {

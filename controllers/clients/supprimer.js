@@ -3,7 +3,6 @@ const prisma = new PrismaClient();
 
 // Supprimer un client avec suppression des données liées
 const supprimer = async (req, res) => {
-  console.log("Supprimer un client", req.params);
 
   try {
     const { uuid } = req.params;

@@ -4,7 +4,6 @@ const bcrypt = require("bcrypt");
 
 // Ajouter un client avec ses relations
 const ajouter = async (req, res) => {
-  console.log("Ajouter un client:", req.body);
 
   try {
     const { pseudo, motDePasse, roleId, personne, entreprise, addresses } =
