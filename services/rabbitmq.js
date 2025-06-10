@@ -19,104 +19,48 @@ class RabbitMQService {
     }
 
     async connect() {
-        if (this.isConnecting) {
-            console.log('Connexion déjà en cours...');
-            return;
-        }
-
-        this.isConnecting = true;
-        let retries = 0;
-
-        while (retries < MAX_RETRIES) {
-            try {
-                console.log(`Tentative de connexion à RabbitMQ (${retries + 1}/${MAX_RETRIES})...`);
-                this.connection = await amqp.connect(RABBITMQ_URL);
-                this.channel = await this.connection.createChannel();
-
-                // Déclaration des queues
-                await this.channel.assertQueue(this.queues.produits, { durable: true });
-                await this.channel.assertQueue(this.queues.commandes, { durable: true });
-                await this.channel.assertQueue(this.queues.main, { durable: true });
-
-                console.log('Connecté à RabbitMQ avec succès');
-                this.isConnecting = false;
-                return;
-            } catch (error) {
-                retries++;
-                console.error(`Échec de la connexion (tentative ${retries}/${MAX_RETRIES}):`, error.message);
-                
-                if (retries === MAX_RETRIES) {
-                    console.error('Impossible de se connecter à RabbitMQ après plusieurs tentatives');
-                    this.isConnecting = false;
-                    throw error;
-                }
-                
-                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
-            }
+        try {
+            this.connection = await amqp.connect(process.env.RABBITMQ_URL || 'amqp://localhost');
+            this.channel = await this.connection.createChannel();
+            console.log('Connecté à RabbitMQ');
+            return true;
+        } catch (error) {
+            console.error('Erreur de connexion à RabbitMQ:', error);
+            return false;
         }
     }
 
-    async listenToProduits(callback) {
+    async publishMessage(queue, message) {
+        if (!this.channel) {
+            throw new Error('Channel RabbitMQ non initialisé');
+        }
         try {
-            await this.channel.consume(this.queues.produits, (msg) => {
-                if (msg !== null) {
-                    const content = JSON.parse(msg.content.toString());
-                    console.log('Message reçu du service Produits:', content);
-                    callback(content);
-                    this.channel.ack(msg);
-                }
-            });
-            console.log('Écoute du service Produits activée');
+            await this.channel.assertQueue(queue, { durable: true });
+            this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
+            console.log(`Message publié dans la queue ${queue}:`, message);
         } catch (error) {
-            console.error('Erreur lors de l\'écoute du service Produits:', error);
+            console.error('Erreur lors de la publication du message:', error);
             throw error;
         }
     }
 
-    async listenToCommandes(callback) {
+    async listenToQueue(queue, callback) {
+        if (!this.channel) {
+            throw new Error('Channel RabbitMQ non initialisé');
+        }
         try {
-            await this.channel.consume(this.queues.commandes, (msg) => {
+            await this.channel.assertQueue(queue, { durable: true });
+            this.channel.consume(queue, (msg) => {
                 if (msg !== null) {
                     const content = JSON.parse(msg.content.toString());
-                    console.log('Message reçu du service Commandes:', content);
+                    console.log(`Message reçu de la queue ${queue}:`, content);
                     callback(content);
                     this.channel.ack(msg);
                 }
             });
-            console.log('Écoute du service Commandes activée');
+            console.log(`Écoute de la queue ${queue} démarrée`);
         } catch (error) {
-            console.error('Erreur lors de l\'écoute du service Commandes:', error);
-            throw error;
-        }
-    }
-
-    async listenToMain(callback) {
-        try {
-            await this.channel.consume(this.queues.main, (msg) => {
-                if (msg !== null) {
-                    const content = JSON.parse(msg.content.toString());
-                    console.log('Message reçu du service Principal:', content);
-                    callback(content);
-                    this.channel.ack(msg);
-                }
-            });
-            console.log('Écoute du service Principal activée');
-        } catch (error) {
-            console.error('Erreur lors de l\'écoute du service Principal:', error);
-            throw error;
-        }
-    }
-
-    async publishToQueue(queueName, message) {
-        try {
-            const queue = this.queues[queueName];
-            if (!queue) {
-                throw new Error(`Queue ${queueName} non trouvée`);
-            }
-            await this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
-            console.log(`Message publié dans la queue ${queueName}:`, message);
-        } catch (error) {
-            console.error(`Erreur lors de la publication dans la queue ${queueName}:`, error);
+            console.error('Erreur lors de l\'écoute de la queue:', error);
             throw error;
         }
     }
@@ -137,4 +81,5 @@ class RabbitMQService {
     }
 }
 
-module.exports = new RabbitMQService(); 
+const rabbitmq = new RabbitMQService();
+module.exports = rabbitmq; 

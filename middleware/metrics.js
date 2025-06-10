@@ -1,28 +1,28 @@
-const client = require('prom-client');
+const prometheus = require('prom-client');
 
-const register = new client.Registry();
+const register = new prometheus.Registry();
 
-client.collectDefaultMetrics({
+prometheus.collectDefaultMetrics({
     app: 'api-clients',
     prefix: 'api_clients_',
     timeout: 10000,
     register
 });
 
-const httpRequestDurationMicroseconds = new client.Histogram({
+const httpRequestDurationMicroseconds = new prometheus.Histogram({
     name: 'http_request_duration_seconds',
-    help: 'Duration of HTTP requests in seconds',
+    help: 'Durée des requêtes HTTP en secondes',
     labelNames: ['method', 'route', 'status_code'],
     buckets: [0.1, 0.5, 1, 2, 5]
 });
 
-const httpRequestsTotal = new client.Counter({
+const httpRequestsTotal = new prometheus.Counter({
     name: 'http_requests_total',
-    help: 'Total number of HTTP requests',
+    help: 'Nombre total de requêtes HTTP',
     labelNames: ['method', 'route', 'status_code']
 });
 
-const activeConnections = new client.Gauge({
+const activeConnections = new prometheus.Gauge({
     name: 'active_connections',
     help: 'Number of active connections'
 });
@@ -31,12 +31,12 @@ register.registerMetric(httpRequestDurationMicroseconds);
 register.registerMetric(httpRequestsTotal);
 register.registerMetric(activeConnections);
 
-const metricsMiddleware = async (req, res, next) => {
+const metricsMiddleware = (req, res, next) => {
     const start = Date.now();
     
     res.on('finish', () => {
         const duration = Date.now() - start;
-        const route = req.route ? req.route.path : req.path;
+        const route = req.route ? req.route.path : 'unknown';
         
         httpRequestDurationMicroseconds
             .labels(req.method, route, res.statusCode.toString())
@@ -51,8 +51,8 @@ const metricsMiddleware = async (req, res, next) => {
 };
 
 const metricsRoute = async (req, res) => {
-    res.set('Content-Type', register.contentType);
-    res.end(await register.metrics());
+    res.set('Content-Type', prometheus.register.contentType);
+    res.end(await prometheus.register.metrics());
 };
 
 module.exports = {
