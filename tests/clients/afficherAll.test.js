@@ -1,4 +1,4 @@
-const afficherAll = require("../../controllers/clients/afficherAll");
+const clientController = require("../../controllers/clientsController");
 const { PrismaClient } = require("@prisma/client");
 
 // Mock de Prisma Client
@@ -44,7 +44,7 @@ describe("afficherAll clients", () => {
 
       prisma.client.findMany.mockResolvedValue(mockClients);
 
-      await afficherAll(req, res);
+      await clientController.afficherAll(req, res);
 
       expect(prisma.client.findMany).toHaveBeenCalledWith({
         orderBy: {
@@ -70,7 +70,7 @@ describe("afficherAll clients", () => {
     it("devrait retourner un tableau vide si aucun client", async () => {
       prisma.client.findMany.mockResolvedValue([]);
 
-      await afficherAll(req, res);
+      await clientController.afficherAll(req, res);
 
       expect(prisma.client.findMany).toHaveBeenCalledWith({
         orderBy: {
@@ -99,7 +99,7 @@ describe("afficherAll clients", () => {
 
       const consoleSpy = jest.spyOn(console, "error").mockImplementation();
 
-      await afficherAll(req, res);
+      await clientController.afficherAll(req, res);
 
       expect(consoleSpy).toHaveBeenCalledWith("Erreur:", error);
       expect(res.status).toHaveBeenCalledWith(500);
@@ -115,13 +115,13 @@ describe("afficherAll clients", () => {
   describe("Vérifications supplémentaires", () => {
     it("devrait appeler findMany une seule fois", async () => {
       prisma.client.findMany.mockResolvedValue([]);
-      await afficherAll(req, res);
+      await clientController.afficherAll(req, res);
       expect(prisma.client.findMany).toHaveBeenCalledTimes(1);
     });
 
     it("ne devrait pas appeler res.status si tout se passe bien", async () => {
       prisma.client.findMany.mockResolvedValue([]);
-      await afficherAll(req, res);
+      await clientController.afficherAll(req, res);
       expect(res.status).not.toHaveBeenCalled();
     });
   });
