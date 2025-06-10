@@ -1,4 +1,4 @@
-const modifier = require("../../controllers/clients/modifier");
+const clientController = require("../../controllers/clientsController");
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcrypt");
 
@@ -56,12 +56,18 @@ describe("modifier client", () => {
       roleId: 3,
     });
 
-    await modifier(req, res);
+    await clientController.modifier(req, res);
 
     expect(prisma.client.findUnique).toHaveBeenCalledWith({
       where: { id: req.params.uuid },
+      include: {
+        personne: true,
+        entreprise: true,
+        addresses: true,
+        role: true,
+      },
     });
-
+    
     expect(bcrypt.hash).toHaveBeenCalledWith(req.body.motDePasse, 10);
 
     expect(prisma.client.update).toHaveBeenCalledWith({
@@ -89,7 +95,7 @@ describe("modifier client", () => {
   it("devrait retourner 404 si client non trouvé", async () => {
     prisma.client.findUnique.mockResolvedValue(null); // pas trouvé
 
-    await modifier(req, res);
+    await clientController.modifier(req, res);
 
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({
@@ -111,7 +117,7 @@ describe("modifier client", () => {
     const error = new Error("Erreur DB");
     prisma.client.update.mockRejectedValue(error);
 
-    await modifier(req, res);
+    await clientController.modifier(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
