@@ -12,3 +12,19 @@ exports.getClientById = async (id) => {
     },
   });
 };
+
+exports.getAllClients = async () => {
+  return await prisma.client.findMany({
+    include: {
+      addresses: true,
+      entreprise: true,
+      personne: true,
+      role: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+

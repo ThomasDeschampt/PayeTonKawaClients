@@ -7,5 +7,7 @@ const validateUUID = require('../middleware/uuidValidation.js');
 const clientsController = require("../controllers/clientsController");
 
 router.get("/afficher/:uuid", authorized, validateUUID, clientsController.afficher);
+router.get("/afficherAll", authorized, clientsController.afficherAll);
+
 
 module.exports = router;

@@ -16,3 +16,22 @@ exports.afficher = async (req, res) => {
   }
 };
 
+exports.afficherAll = async (req, res) => {
+  try {
+    const clients = await clientsService.getAllClients();
+
+    res.json({
+      success: true,
+      data: clients,
+      count: clients.length,
+    });
+  } catch (error) {
+    console.error("Erreur:", error);
+    res.status(500).json({
+      success: false,
+      message: "Erreur serveur",
+    });
+  }
+};
+
+
