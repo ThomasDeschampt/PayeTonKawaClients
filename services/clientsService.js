@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const bcrypt = require("bcrypt");
 
 exports.getClientById = async (id) => {
   return await prisma.client.findUnique({
@@ -27,8 +28,6 @@ exports.getAllClients = async () => {
   });
 };
 
-const bcrypt = require("bcrypt");
-
 exports.createClient = async ({ pseudo, motDePasse, roleId, personne, entreprise, addresses }) => {
   const hashedPassword = await bcrypt.hash(motDePasse, 10);
 
@@ -49,3 +48,26 @@ exports.createClient = async ({ pseudo, motDePasse, roleId, personne, entreprise
   });
 };
 
+exports.updateClient = async (id, { pseudo, motDePasse, roleId }) => {
+  const dataToUpdate = {};
+
+  if (pseudo !== undefined && pseudo !== "") {
+    dataToUpdate.pseudo = pseudo;
+  }
+
+  if (motDePasse !== undefined && motDePasse !== "") {
+    dataToUpdate.motDePasse = await bcrypt.hash(motDePasse, 10);
+  }
+
+  if (roleId !== undefined && roleId !== "") {
+    const roleIdParsed = parseInt(roleId);
+    if (!isNaN(roleIdParsed)) {
+      dataToUpdate.roleId = roleIdParsed;
+    }
+  }
+
+  return await prisma.client.update({
+    where: { id },
+    data: dataToUpdate,
+  });
+};

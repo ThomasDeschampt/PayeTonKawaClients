@@ -68,3 +68,39 @@ exports.ajouter = async (req, res) => {
   }
 };
 
+exports.modifier = async (req, res) => {
+  try {
+    const { uuid } = req.params;
+    const { pseudo, motDePasse, roleId } = req.body;
+
+    // Vérifier que le client existe avant update
+    const clientExistant = await clientsService.getClientById(uuid);
+
+    if (!clientExistant) {
+      return res.status(404).json({
+        success: false,
+        message: "Client non trouvé",
+      });
+    }
+
+    const clientMisAJour = await clientsService.updateClient(uuid, {
+      pseudo,
+      motDePasse,
+      roleId,
+    });
+
+    res.json({
+      success: true,
+      message: "Client mis à jour avec succès",
+      data: clientMisAJour,
+    });
+  } catch (error) {
+    console.error("Erreur:", error);
+    res.status(500).json({
+      success: false,
+      message: "Erreur serveur",
+    });
+  }
+};
+
+
