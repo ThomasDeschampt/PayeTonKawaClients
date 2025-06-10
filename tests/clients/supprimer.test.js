@@ -1,29 +1,11 @@
-const supprimer = require("../../controllers/clients/supprimer");
-const { PrismaClient } = require("@prisma/client");
+const clientController = require("../../controllers/clientsController");
 
-// Mock PrismaClient
-jest.mock("@prisma/client", () => {
-  const mockPrisma = {
-    client: {
-      findUnique: jest.fn(),
-      delete: jest.fn(),
-    },
-    address: {
-      deleteMany: jest.fn(),
-    },
-    entrepriseDetails: {
-      deleteMany: jest.fn(),
-    },
-    personneDetails: {
-      deleteMany: jest.fn(),
-    },
-  };
-  return {
-    PrismaClient: jest.fn(() => mockPrisma),
-  };
-});
+jest.mock("../../services/clientsService", () => ({
+  getClientById: jest.fn(),
+  deleteClient: jest.fn(),
+}));
 
-const prisma = new PrismaClient();
+const clientsService = require("../../services/clientsService");
 
 describe("supprimer client", () => {
   let req, res;
@@ -38,33 +20,13 @@ describe("supprimer client", () => {
   });
 
   it("devrait supprimer un client et ses données liées avec succès", async () => {
-    // Client trouvé
-    prisma.client.findUnique.mockResolvedValue({ id: req.params.uuid });
+    clientsService.getClientById.mockResolvedValue({ id: req.params.uuid });
+    clientsService.deleteClient.mockResolvedValue({}); // simulé comme réussi
 
-    // Suppressions liées réussies
-    prisma.address.deleteMany.mockResolvedValue({});
-    prisma.entrepriseDetails.deleteMany.mockResolvedValue({});
-    prisma.personneDetails.deleteMany.mockResolvedValue({});
-    prisma.client.delete.mockResolvedValue({ id: req.params.uuid });
+    await clientController.supprimer(req, res);
 
-    await supprimer(req, res);
-
-    expect(prisma.client.findUnique).toHaveBeenCalledWith({
-      where: { id: req.params.uuid },
-    });
-
-    expect(prisma.address.deleteMany).toHaveBeenCalledWith({
-      where: { clientId: req.params.uuid },
-    });
-    expect(prisma.entrepriseDetails.deleteMany).toHaveBeenCalledWith({
-      where: { clientId: req.params.uuid },
-    });
-    expect(prisma.personneDetails.deleteMany).toHaveBeenCalledWith({
-      where: { clientId: req.params.uuid },
-    });
-    expect(prisma.client.delete).toHaveBeenCalledWith({
-      where: { id: req.params.uuid },
-    });
+    expect(clientsService.getClientById).toHaveBeenCalledWith("uuid-123");
+    expect(clientsService.deleteClient).toHaveBeenCalledWith("uuid-123");
 
     expect(res.json).toHaveBeenCalledWith({
       success: true,
@@ -75,9 +37,9 @@ describe("supprimer client", () => {
   });
 
   it("devrait retourner 404 si client non trouvé", async () => {
-    prisma.client.findUnique.mockResolvedValue(null);
+    clientsService.getClientById.mockResolvedValue(null); // simulate client not found
 
-    await supprimer(req, res);
+    await clientController.supprimer(req, res);
 
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({
@@ -87,12 +49,10 @@ describe("supprimer client", () => {
   });
 
   it("devrait gérer une erreur serveur", async () => {
-    prisma.client.findUnique.mockResolvedValue({ id: req.params.uuid });
-    // Simuler une erreur lors de la suppression d’adresses
-    const error = new Error("Erreur DB");
-    prisma.address.deleteMany.mockRejectedValue(error);
+    clientsService.getClientById.mockResolvedValue({ id: req.params.uuid });
+    clientsService.deleteClient.mockRejectedValue(new Error("Erreur DB")); // simulate failure
 
-    await supprimer(req, res);
+    await clientController.supprimer(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
