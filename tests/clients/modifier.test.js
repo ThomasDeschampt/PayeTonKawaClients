@@ -1,24 +1,11 @@
-const modifier = require("../../controllers/clients/modifier");
-const { PrismaClient } = require("@prisma/client");
-const bcrypt = require("bcrypt");
+const clientController = require("../../controllers/clientsController");
+const clientsService = require("../../services/clientsService");
 
-// Mock PrismaClient
-jest.mock("@prisma/client", () => {
-  const mockPrisma = {
-    client: {
-      findUnique: jest.fn(),
-      update: jest.fn(),
-    },
-  };
-  return {
-    PrismaClient: jest.fn(() => mockPrisma),
-  };
-});
-
-// Mock bcrypt
-jest.mock("bcrypt");
-
-const prisma = new PrismaClient();
+// Mock du service
+jest.mock("../../services/clientsService", () => ({
+  getClientById: jest.fn(),
+  updateClient: jest.fn(),
+}));
 
 describe("modifier client", () => {
   let req, res;
@@ -26,7 +13,11 @@ describe("modifier client", () => {
   beforeEach(() => {
     req = {
       params: { uuid: "uuid-123" },
-      body: {},
+      body: {
+        pseudo: "nouveauPseudo",
+        motDePasse: "newpassword",
+        roleId: "3",
+      },
     };
     res = {
       json: jest.fn(),
@@ -36,60 +27,40 @@ describe("modifier client", () => {
   });
 
   it("devrait modifier un client avec succès", async () => {
-    req.body = {
+    clientsService.getClientById.mockResolvedValue({ id: req.params.uuid });
+
+    const updatedClient = {
+      id: req.params.uuid,
+      pseudo: "nouveauPseudo",
+      motDePasse: "hashedPassword", // on fait comme si le hash est fait dans le service
+      roleId: 3,
+    };
+
+    clientsService.updateClient.mockResolvedValue(updatedClient);
+
+    await clientController.modifier(req, res);
+
+    expect(clientsService.getClientById).toHaveBeenCalledWith("uuid-123");
+
+    expect(clientsService.updateClient).toHaveBeenCalledWith("uuid-123", {
       pseudo: "nouveauPseudo",
       motDePasse: "newpassword",
       roleId: "3",
-    };
-
-    // Simuler client existant
-    prisma.client.findUnique.mockResolvedValue({ id: req.params.uuid });
-
-    // Simuler hash du mot de passe
-    bcrypt.hash.mockResolvedValue("hashedPassword");
-
-    // Simuler update client
-    prisma.client.update.mockResolvedValue({
-      id: req.params.uuid,
-      pseudo: req.body.pseudo,
-      motDePasse: "hashedPassword",
-      roleId: 3,
-    });
-
-    await modifier(req, res);
-
-    expect(prisma.client.findUnique).toHaveBeenCalledWith({
-      where: { id: req.params.uuid },
-    });
-
-    expect(bcrypt.hash).toHaveBeenCalledWith(req.body.motDePasse, 10);
-
-    expect(prisma.client.update).toHaveBeenCalledWith({
-      where: { id: req.params.uuid },
-      data: {
-        pseudo: "nouveauPseudo",
-        motDePasse: "hashedPassword",
-        roleId: 3,
-      },
     });
 
     expect(res.json).toHaveBeenCalledWith({
       success: true,
       message: "Client mis à jour avec succès",
-      data: {
-        id: req.params.uuid,
-        pseudo: req.body.pseudo,
-        motDePasse: "hashedPassword",
-        roleId: 3,
-      },
+      data: updatedClient,
     });
-    expect(res.status).not.toHaveBeenCalled();
+
+    expect(res.status).not.toHaveBeenCalled(); // réponse OK = 200 par défaut
   });
 
   it("devrait retourner 404 si client non trouvé", async () => {
-    prisma.client.findUnique.mockResolvedValue(null); // pas trouvé
+    clientsService.getClientById.mockResolvedValue(null);
 
-    await modifier(req, res);
+    await clientController.modifier(req, res);
 
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({
@@ -99,19 +70,10 @@ describe("modifier client", () => {
   });
 
   it("devrait gérer une erreur serveur", async () => {
-    req.body = {
-      pseudo: "nouveauPseudo",
-      motDePasse: "newpassword",
-      roleId: "3",
-    };
+    clientsService.getClientById.mockResolvedValue({ id: req.params.uuid });
+    clientsService.updateClient.mockRejectedValue(new Error("Erreur DB"));
 
-    prisma.client.findUnique.mockResolvedValue({ id: req.params.uuid });
-    bcrypt.hash.mockResolvedValue("hashedPassword");
-
-    const error = new Error("Erreur DB");
-    prisma.client.update.mockRejectedValue(error);
-
-    await modifier(req, res);
+    await clientController.modifier(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({

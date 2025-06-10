@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const rateLimit = require('express-rate-limit');
 const setupSwagger = require("./swagger");
 const { PrismaClient } = require("@prisma/client");
 require("dotenv").config();
@@ -8,6 +9,19 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
 
+// Protection DDoS - Limitation du taux de requêtes
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: {
+    success: false,
+    message: 'Trop de requêtes depuis cette IP, réessayez dans 15 minutes.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(limiter);
 app.use(cors());
 app.use(express.json());
 app.use("/api/clients", require("./routes/clients"));
@@ -24,6 +38,7 @@ app.use("*", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Serveur démarré sur le port ${PORT}`);
   console.log(`API disponible sur http://localhost:${PORT}/api`);
+  console.log(`Protection DDoS activée (${limiter.max}req/${limiter.windowMs}ms par IP)`);
 
   const jwt = require("jsonwebtoken");
 
