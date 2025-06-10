@@ -8,7 +8,7 @@ module.exports = {
         max: 100 
     },
     rabbitmq: {
-        url: process.env.RABBITMQ_URL || 'amqp://localhost',
+        url: process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5673',
         queues: {
             clientCreated: 'client.created',
             clientUpdated: 'client.updated',

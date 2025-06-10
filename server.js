@@ -12,6 +12,8 @@ require("dotenv").config();
 const app = express();
 const prisma = new PrismaClient();
 
+console.log('Configuration RabbitMQ:', config.rabbitmq.url);
+
 const limiter = rateLimit({
     windowMs: config.rateLimit.windowMs,
     max: config.rateLimit.max,
@@ -48,6 +50,7 @@ app.use(errorHandler);
 
 async function initializeRabbitMQ() {
     try {
+        console.log('Tentative de connexion à RabbitMQ avec URL:', config.rabbitmq.url);
         const connected = await rabbitmq.connect();
         if (!connected) {
             console.error('Impossible de se connecter à RabbitMQ');
