@@ -27,4 +27,25 @@ exports.getAllClients = async () => {
   });
 };
 
+const bcrypt = require("bcrypt");
+
+exports.createClient = async ({ pseudo, motDePasse, roleId, personne, entreprise, addresses }) => {
+  const hashedPassword = await bcrypt.hash(motDePasse, 10);
+
+  return await prisma.client.create({
+    data: {
+      pseudo,
+      motDePasse: hashedPassword,
+      roleId: parseInt(roleId),
+      personne: personne ? { create: personne } : undefined,
+      entreprise: entreprise ? { create: entreprise } : undefined,
+      addresses: addresses ? { create: addresses } : undefined,
+    },
+    include: {
+      personne: true,
+      entreprise: true,
+      addresses: true,
+    },
+  });
+};
 

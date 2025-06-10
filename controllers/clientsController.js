@@ -34,4 +34,37 @@ exports.afficherAll = async (req, res) => {
   }
 };
 
+exports.ajouter = async (req, res) => {
+  try {
+    const { pseudo, motDePasse, roleId, personne, entreprise, addresses } = req.body;
+
+    if (!pseudo || !motDePasse || !roleId) {
+      return res.status(400).json({
+        success: false,
+        message: "pseudo, motDePasse et roleId sont requis",
+      });
+    }
+
+    const nouveauClient = await clientsService.createClient({
+      pseudo,
+      motDePasse,
+      roleId,
+      personne,
+      entreprise,
+      addresses,
+    });
+
+    res.status(201).json({
+      success: true,
+      data: nouveauClient,
+      message: "Client créé avec succès",
+    });
+  } catch (error) {
+    console.error("Erreur:", error);
+    res.status(500).json({
+      success: false,
+      message: "Erreur serveur",
+    });
+  }
+};
 
