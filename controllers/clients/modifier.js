@@ -4,7 +4,6 @@ const bcrypt = require("bcrypt");
 
 // Modifier un client
 const modifier = async (req, res) => {
-  console.log("Modifier un client ", req.body);
 
   try {
     const { uuid } = req.params;
