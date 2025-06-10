@@ -9,7 +9,6 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
 
-// Protection DDoS - Limitation du taux de requêtes
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,

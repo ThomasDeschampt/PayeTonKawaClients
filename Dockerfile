@@ -11,7 +11,6 @@ RUN npx prisma generate
 
 COPY . .
 
-# Stage final
 FROM node:20-alpine
 
 WORKDIR /app
@@ -24,9 +23,8 @@ COPY --from=builder /app/swagger.js ./
 COPY --from=builder /app/routes ./routes
 COPY --from=builder /app/controllers ./controllers
 COPY --from=builder /app/middleware ./middleware
+COPY --from=builder /app/services ./services
 
-# Exposition du port
 EXPOSE 3000
 
-# Commande de démarrage
 CMD ["npm", "start"] 
