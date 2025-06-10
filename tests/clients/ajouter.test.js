@@ -1,25 +1,9 @@
 const clientController = require("../../controllers/clientsController");
-const { PrismaClient } = require("@prisma/client");
-const bcrypt = require("bcrypt");
+const clientsService = require("../../services/clientsService");
 
-// Mock Prisma Client
-jest.mock("@prisma/client", () => {
-  const mockPrisma = {
-    client: {
-      create: jest.fn(),
-    },
-  };
-  return {
-    PrismaClient: jest.fn(() => mockPrisma),
-  };
-});
-
-// Mock bcrypt.hash
-jest.mock("bcrypt", () => ({
-  hash: jest.fn(),
+jest.mock("../../services/clientsService", () => ({
+  createClient: jest.fn(),
 }));
-
-const prisma = new PrismaClient();
 
 describe("ajouter client", () => {
   let req, res;
@@ -45,13 +29,10 @@ describe("ajouter client", () => {
       success: false,
       message: "pseudo, motDePasse et roleId sont requis",
     });
-    expect(prisma.client.create).not.toHaveBeenCalled();
+    expect(clientsService.createClient).not.toHaveBeenCalled();
   });
 
-  it("devrait créer un client avec hash de mot de passe", async () => {
-    const fakeHash = "hashedpassword";
-    bcrypt.hash.mockResolvedValue(fakeHash);
-
+  it("devrait appeler createClient et retourner le client créé", async () => {
     req.body = {
       pseudo: "client1",
       motDePasse: "password123",
@@ -64,38 +45,18 @@ describe("ajouter client", () => {
     const createdClient = {
       id: "uuid-1",
       pseudo: "client1",
-      motDePasse: fakeHash,
+      motDePasse: "hashedpassword",
       roleId: 2,
       personne: req.body.personne,
       entreprise: req.body.entreprise,
       addresses: req.body.addresses,
     };
 
-    prisma.client.create.mockResolvedValue(createdClient);
+    clientsService.createClient.mockResolvedValue(createdClient);
 
     await clientController.ajouter(req, res);
 
-    // Vérifier que bcrypt.hash a été appelé avec le mot de passe et salt rounds 10
-    expect(bcrypt.hash).toHaveBeenCalledWith("password123", 10);
-
-    // Vérifier l'appel à prisma.client.create avec les bonnes données
-    expect(prisma.client.create).toHaveBeenCalledWith({
-      data: {
-        pseudo: "client1",
-        motDePasse: fakeHash,
-        roleId: 2,
-        personne: { create: req.body.personne },
-        entreprise: { create: req.body.entreprise },
-        addresses: { create: req.body.addresses },
-      },
-      include: {
-        personne: true,
-        entreprise: true,
-        addresses: true,
-      },
-    });
-
-    // Vérifier la réponse
+    expect(clientsService.createClient).toHaveBeenCalledWith(req.body);
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
       success: true,
@@ -111,9 +72,7 @@ describe("ajouter client", () => {
       roleId: "2",
     };
 
-    bcrypt.hash.mockResolvedValue("hash");
-    const error = new Error("Erreur DB");
-    prisma.client.create.mockRejectedValue(error);
+    clientsService.createClient.mockRejectedValue(new Error("Erreur DB"));
 
     await clientController.ajouter(req, res);
 
