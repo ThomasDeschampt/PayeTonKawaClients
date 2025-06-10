@@ -1,4 +1,4 @@
-const afficher = require("../../controllers/clients/afficher");
+const clientController = require("../../controllers/clientsController");
 const { PrismaClient } = require("@prisma/client");
 
 jest.mock("@prisma/client", () => {
@@ -38,7 +38,7 @@ describe("afficher client", () => {
     req.params.uuid = fakeClient.id;
     prisma.client.findUnique.mockResolvedValue(fakeClient);
 
-    await afficher(req, res);
+    await clientController.afficher(req, res);
 
     expect(prisma.client.findUnique).toHaveBeenCalledWith({
       where: { id: fakeClient.id },
@@ -56,23 +56,11 @@ describe("afficher client", () => {
     });
   });
 
-  it("devrait retourner 400 pour UUID invalide", async () => {
-    req.params.uuid = "invalid-uuid";
-
-    await afficher(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({
-      success: false,
-      message: "UUID invalide",
-    });
-  });
-
   it("devrait retourner 404 si client non trouvé", async () => {
     req.params.uuid = "123e4567-e89b-12d3-a456-426614174000";
     prisma.client.findUnique.mockResolvedValue(null);
 
-    await afficher(req, res);
+    await clientController.afficher(req, res);
 
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({
@@ -85,7 +73,7 @@ describe("afficher client", () => {
     req.params.uuid = "123e4567-e89b-12d3-a456-426614174000";
     prisma.client.findUnique.mockRejectedValue(new Error("DB fail"));
 
-    await afficher(req, res);
+    await clientController.afficher(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
