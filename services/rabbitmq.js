@@ -6,6 +6,29 @@ const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:4
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 
+const EXCHANGES = {
+    COMMAND: 'command.exchange',
+    PRODUCT: 'product.exchange',
+    CLIENT: 'client.exchange'
+};
+
+const QUEUES = {
+    // Queues pour les produits
+    PRODUCT_CREATED: 'product.created',
+    PRODUCT_UPDATED: 'product.updated',
+    PRODUCT_DELETED: 'product.deleted',
+    
+    // Queues pour les commandes
+    ORDER_CREATED: 'order.created',
+    ORDER_UPDATED: 'order.updated',
+    ORDER_DELETED: 'order.deleted',
+    
+    // Queues pour les clients
+    CLIENT_CREATED: 'client.created',
+    CLIENT_UPDATED: 'client.updated',
+    CLIENT_DELETED: 'client.deleted'
+};
+
 class RabbitMQService {
     constructor() {
         this.connection = null;
@@ -84,4 +107,80 @@ class RabbitMQService {
 }
 
 const rabbitmq = new RabbitMQService();
-module.exports = rabbitmq; 
+
+async function initializeRabbitMQ() {
+    try {
+        const connection = await amqp.connect(RABBITMQ_URL);
+        const channel = await connection.createChannel();
+
+        // Déclaration des échanges
+        await channel.assertExchange(EXCHANGES.COMMAND, 'topic', { durable: true });
+        await channel.assertExchange(EXCHANGES.PRODUCT, 'topic', { durable: true });
+        await channel.assertExchange(EXCHANGES.CLIENT, 'topic', { durable: true });
+
+        // Déclaration des queues
+        for (const queue of Object.values(QUEUES)) {
+            await channel.assertQueue(queue, { durable: true });
+        }
+
+        // Binding des queues aux échanges
+        // Produits
+        await channel.bindQueue(QUEUES.PRODUCT_CREATED, EXCHANGES.PRODUCT, 'product.created');
+        await channel.bindQueue(QUEUES.PRODUCT_UPDATED, EXCHANGES.PRODUCT, 'product.updated');
+        await channel.bindQueue(QUEUES.PRODUCT_DELETED, EXCHANGES.PRODUCT, 'product.deleted');
+
+        // Commandes
+        await channel.bindQueue(QUEUES.ORDER_CREATED, EXCHANGES.COMMAND, 'order.created');
+        await channel.bindQueue(QUEUES.ORDER_UPDATED, EXCHANGES.COMMAND, 'order.updated');
+        await channel.bindQueue(QUEUES.ORDER_DELETED, EXCHANGES.COMMAND, 'order.deleted');
+
+        // Clients
+        await channel.bindQueue(QUEUES.CLIENT_CREATED, EXCHANGES.CLIENT, 'client.created');
+        await channel.bindQueue(QUEUES.CLIENT_UPDATED, EXCHANGES.CLIENT, 'client.updated');
+        await channel.bindQueue(QUEUES.CLIENT_DELETED, EXCHANGES.CLIENT, 'client.deleted');
+
+        return { connection, channel };
+    } catch (error) {
+        console.error('Erreur lors de l\'initialisation de RabbitMQ:', error);
+        throw error;
+    }
+}
+
+// Fonction pour publier un message
+async function publishMessage(channel, exchange, routingKey, message) {
+    try {
+        await channel.publish(
+            exchange,
+            routingKey,
+            Buffer.from(JSON.stringify(message)),
+            { persistent: true }
+        );
+    } catch (error) {
+        console.error('Erreur lors de la publication du message:', error);
+        throw error;
+    }
+}
+
+// Fonction pour consommer des messages
+async function consumeMessages(channel, queue, callback) {
+    try {
+        await channel.consume(queue, async (msg) => {
+            if (msg !== null) {
+                const content = JSON.parse(msg.content.toString());
+                await callback(content);
+                channel.ack(msg);
+            }
+        });
+    } catch (error) {
+        console.error('Erreur lors de la consommation des messages:', error);
+        throw error;
+    }
+}
+
+module.exports = {
+    initializeRabbitMQ,
+    publishMessage,
+    consumeMessages,
+    EXCHANGES,
+    QUEUES
+}; 
