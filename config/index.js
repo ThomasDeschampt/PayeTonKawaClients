@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 module.exports = {
     server: {
         port: process.env.PORT || 3003,
@@ -8,7 +10,7 @@ module.exports = {
         max: 100 
     },
     rabbitmq: {
-        url: process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5673',
+        url: process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:4003',
         queues: {
             clientCreated: 'client.created',
             clientUpdated: 'client.updated',

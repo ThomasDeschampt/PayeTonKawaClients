@@ -2,7 +2,7 @@ const amqp = require('amqplib');
 const config = require('../config');
 require('dotenv').config();
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5673';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:4003';
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 
