@@ -1,32 +1,35 @@
 version: '3.8'
 
 services:
-  app:
+  api-clients:
     build: .
     ports:
       - "3003:3003"
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/payetonkawa_clients
-      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
-      - JWT_SECRET=votre_secret_jwt
+      - DATABASE_URL=process.env.DATABASE_URL
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:4003
+      - DEBUG=*
+      - PORT=3003
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
     depends_on:
       rabbitmq:
         condition: service_healthy
-      db:
-        condition: service_healthy
-    volumes:
-      - .:/app
-      - /app/node_modules
-    networks:
-      - payetonkawa-network
     restart: unless-stopped
+    networks:
+      - app-network
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3003/health"]
       interval: 10s
       timeout: 5s
       retries: 3
       start_period: 30s
+    labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=3003"
+      - "prometheus.io/path=/metrics"
 
   db:
     image: postgres:15
@@ -51,8 +54,8 @@ services:
     image: rabbitmq:3-management-alpine
     hostname: rabbitmq
     ports:
-      - "5673:5672"
-      - "15673:15672"
+      - "4003:5672"   
+      - "15675:15672" 
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
@@ -60,40 +63,50 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
-      - payetonkawa-network
+      - app-network
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
       interval: 5s
       timeout: 3s
       retries: 3
       start_period: 10s
+    labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=15692"
+      - "prometheus.io/path=/metrics"
     restart: unless-stopped
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:latest
     ports:
-      - "9091:9090"
+      - "6003:9090"
     volumes:
       - ./prometheus:/etc/prometheus
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
     networks:
-      - payetonkawa-network
+      - app-network
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:latest
     ports:
-      - "3004:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - "5003:3000"
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - app-network
     depends_on:
       - prometheus
-    networks:
-      - payetonkawa-network
     restart: unless-stopped
 
 volumes:
@@ -104,4 +117,6 @@ volumes:
 
 networks:
   payetonkawa-network:
+    driver: bridge
+  app-network:
     driver: bridge 

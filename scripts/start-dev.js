@@ -1,15 +1,4 @@
 const { execSync } = require('child_process');
-const { existsSync } = require('fs');
-const path = require('path');
-
-function isPortInUse(port) {
-    try {
-        execSync(`netstat -ano | findstr :${port}`);
-        return true;
-    } catch (error) {
-        return false;
-    }
-}
 
 function stopDockerServices() {
     console.log("Arrêt des services Docker existants...");
@@ -24,8 +13,6 @@ function stopDockerServices() {
 function startDockerServices() {
     console.log("Démarrage des services Docker...");
     try {
-        execSync("docker-compose --version", { stdio: "ignore" });
-        
         execSync("docker-compose up -d", { stdio: "inherit" });
         console.log("Services Docker démarrés avec succès");
     } catch (error) {
@@ -36,7 +23,6 @@ function startDockerServices() {
 
 async function main() {
     stopDockerServices();
-
     startDockerServices();
 
     console.log("Attente du démarrage des services...");
