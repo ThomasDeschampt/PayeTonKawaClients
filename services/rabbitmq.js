@@ -2,7 +2,7 @@ const amqp = require('amqplib');
 const config = require('../config');
 require('dotenv').config();
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5673';
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 
@@ -21,8 +21,8 @@ class RabbitMQService {
 
     async connect() {
         try {
-            console.log('Tentative de connexion à RabbitMQ avec URL:', config.rabbitmq.url);
-            this.connection = await amqp.connect(config.rabbitmq.url);
+            console.log('Tentative de connexion à RabbitMQ avec URL:', RABBITMQ_URL);
+            this.connection = await amqp.connect(RABBITMQ_URL);
             this.channel = await this.connection.createChannel();
             console.log('Connecté à RabbitMQ');
             return true;
