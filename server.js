@@ -3,7 +3,7 @@ const cors = require("cors");
 const rateLimit = require('express-rate-limit');
 const setupSwagger = require("./swagger");
 const { PrismaClient } = require("@prisma/client");
-const rabbitmq = require('./services/rabbitmq');
+const { rabbitmq } = require('./services/rabbitmq');
 const { metricsMiddleware, metricsRoute } = require('./middleware/metrics');
 const errorHandler = require('./middleware/error.middleware');
 const config = require('./config');
@@ -92,6 +92,13 @@ const server = app.listen(config.server.port, async () => {
     console.log(`API disponible sur http://localhost:${config.server.port}/api`);
     console.log('Protection DDoS activée (100 req/15min par IP)');
     console.log('Métriques Prometheus disponibles sur /metrics');
+
+      //temporaire
+  const token = jwt.sign({ username: "testuser" }, process.env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
+
+  console.log(token);
 
     await initializeRabbitMQ();
 });
