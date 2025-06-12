@@ -272,7 +272,7 @@ router.get("/afficherAll", authorized, clientsController.afficherAll);
  *               success: false
  *               message: "Erreur serveur"
  */
-router.post("/ajouter", authorized, clientsController.ajouter);
+router.post("/ajouter", clientsController.ajouter);
 
 /**
  * @swagger
@@ -390,5 +390,9 @@ router.put("/modifier/:uuid", authorized, validateUUID, clientsController.modifi
  *               message: "Erreur serveur"
  */
 router.delete("/supprimer/:uuid", authorized, validateUUID, clientsController.supprimer);
+
+
+//fonction pour verifier si le mot de passe et le pseudo sont corrects
+router.post("/verifier", clientsController.verifierMotDePasse);
 
 module.exports = router;

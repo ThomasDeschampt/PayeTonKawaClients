@@ -131,4 +131,37 @@ exports.supprimer = async (req, res) => {
   }
 };
 
+exports.verifierMotDePasse = async (req, res) => {
+  try {
+    const { pseudo, motDePasse } = req.body;
+
+    if (!pseudo || !motDePasse) {
+      return res.status(400).json({
+        success: false,
+        message: "pseudo et motDePasse sont requis",
+      });
+    }
+
+    const resultat = await clientsService.verifierMotDePasse(pseudo, motDePasse);
+
+    if (!resultat.success) {
+      return res.status(401).json({
+        success: false,
+        message: resultat.message,
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Authentification réussie",
+      data: resultat.client,
+    });
+  } catch (error) {
+    console.error("Erreur:", error);
+    res.status(500).json({
+      success: false,
+      message: "Erreur serveur",
+    });
+  }
+};
 

@@ -80,3 +80,23 @@ exports.deleteClient = async (id) => {
 
   return await prisma.client.delete({ where: { id } });
 };
+
+exports.verifierMotDePasse = async (pseudo, motDePasse) => {
+  const client = await prisma.client.findUnique({
+    where: { pseudo },
+  });
+
+  if (!client) {
+    return { success: false, message: "Pseudo incorrect" };
+  }
+
+  const isPasswordValid = await bcrypt.compare(motDePasse, client.motDePasse);
+
+  if (!isPasswordValid) {
+    return { success: false, message: "Mot de passe incorrect" };
+  }
+
+  // Facultatif : vous pouvez retourner plus d'infos si besoin
+  return { success: true, client };
+};
+
