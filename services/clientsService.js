@@ -92,6 +92,6 @@ exports.verifierMotDePasse = async (pseudo, motDePasse) => {
 
   return {
     success: true,
-    client,
+    client
   };
 };

@@ -152,10 +152,12 @@ exports.verifierMotDePasse = async (req, res) => {
       });
     }
 
+    const { client } = resultat;
+
     const payload = {
           id: client.id,
           pseudo: client.pseudo,
-          role: client.role.name, // <-- rôle ajouté ici
+          role: client.role.name,
         };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {

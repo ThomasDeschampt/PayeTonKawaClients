@@ -214,3 +214,213 @@
   level: 'info',
   message: 'API Call Success'
 }
+{
+  service: 'api-produits',
+  port: 3003,
+  environment: 'development',
+  features: [ 'DDoS Protection', 'Prometheus Metrics', 'Structured Logging' ],
+  level: 'info',
+  message: 'Server started',
+  timestamp: '2025-06-12 11:26:03'
+}
+{
+  service: 'api-produits',
+  api: 'http://localhost:3003/api',
+  metrics: 'http://localhost:3003/metrics',
+  swagger: 'http://localhost:3003/api-docs',
+  level: 'info',
+  message: 'API endpoints available',
+  timestamp: '2025-06-12 11:26:03'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 11:26:20',
+  method: 'POST',
+  url: '/api/clients/verifier',
+  route: '/verifier',
+  statusCode: 500,
+  duration: '446ms',
+  userAgent: 'PostmanRuntime/7.44.0',
+  ip: '::1',
+  query: {},
+  body: { pseudo: 'testtt', motDePasse: 'mdpSuperSecret' },
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 11:27:04',
+  method: 'GET',
+  url: '/api/clients/afficherAll',
+  route: '/afficherAll',
+  statusCode: 403,
+  duration: '4ms',
+  userAgent: 'PostmanRuntime/7.44.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 11:27:16',
+  method: 'GET',
+  url: '/api/clients/afficherAll',
+  route: '/afficherAll',
+  statusCode: 500,
+  duration: '155ms',
+  userAgent: 'PostmanRuntime/7.44.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  port: 3003,
+  environment: 'development',
+  features: [ 'DDoS Protection', 'Prometheus Metrics', 'Structured Logging' ],
+  level: 'info',
+  message: 'Server started',
+  timestamp: '2025-06-12 11:27:37'
+}
+{
+  service: 'api-produits',
+  api: 'http://localhost:3003/api',
+  metrics: 'http://localhost:3003/metrics',
+  swagger: 'http://localhost:3003/api-docs',
+  level: 'info',
+  message: 'API endpoints available',
+  timestamp: '2025-06-12 11:27:37'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 11:27:40',
+  method: 'GET',
+  url: '/api/clients/afficherAll',
+  route: '/afficherAll',
+  statusCode: 200,
+  duration: '473ms',
+  userAgent: 'PostmanRuntime/7.44.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'info',
+  message: 'API Call Success'
+}
+{
+  service: 'api-produits',
+  port: 3003,
+  environment: 'development',
+  features: [ 'DDoS Protection', 'Prometheus Metrics', 'Structured Logging' ],
+  level: 'info',
+  message: 'Server started',
+  timestamp: '2025-06-12 11:28:04'
+}
+{
+  service: 'api-produits',
+  api: 'http://localhost:3003/api',
+  metrics: 'http://localhost:3003/metrics',
+  swagger: 'http://localhost:3003/api-docs',
+  level: 'info',
+  message: 'API endpoints available',
+  timestamp: '2025-06-12 11:28:04'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 11:28:28',
+  method: 'GET',
+  url: '/api/clients/verifier',
+  route: '/',
+  statusCode: 404,
+  duration: '10ms',
+  userAgent: 'PostmanRuntime/7.44.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 11:28:33',
+  method: 'POST',
+  url: '/api/clients/verifier',
+  route: '/verifier',
+  statusCode: 500,
+  duration: '394ms',
+  userAgent: 'PostmanRuntime/7.44.0',
+  ip: '::1',
+  query: {},
+  body: { pseudo: 'testtt', motDePasse: 'mdpSuperSecret' },
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  port: 3003,
+  environment: 'development',
+  features: [ 'DDoS Protection', 'Prometheus Metrics', 'Structured Logging' ],
+  level: 'info',
+  message: 'Server started',
+  timestamp: '2025-06-12 11:29:18'
+}
+{
+  service: 'api-produits',
+  api: 'http://localhost:3003/api',
+  metrics: 'http://localhost:3003/metrics',
+  swagger: 'http://localhost:3003/api-docs',
+  level: 'info',
+  message: 'API endpoints available',
+  timestamp: '2025-06-12 11:29:18'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 11:29:20',
+  method: 'POST',
+  url: '/api/clients/verifier',
+  route: '/verifier',
+  statusCode: 500,
+  duration: '401ms',
+  userAgent: 'PostmanRuntime/7.44.0',
+  ip: '::1',
+  query: {},
+  body: { pseudo: 'testtt', motDePasse: 'mdpSuperSecret' },
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  port: 3003,
+  environment: 'development',
+  features: [ 'DDoS Protection', 'Prometheus Metrics', 'Structured Logging' ],
+  level: 'info',
+  message: 'Server started',
+  timestamp: '2025-06-12 11:30:13'
+}
+{
+  service: 'api-produits',
+  api: 'http://localhost:3003/api',
+  metrics: 'http://localhost:3003/metrics',
+  swagger: 'http://localhost:3003/api-docs',
+  level: 'info',
+  message: 'API endpoints available',
+  timestamp: '2025-06-12 11:30:13'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 11:30:15',
+  method: 'POST',
+  url: '/api/clients/verifier',
+  route: '/verifier',
+  statusCode: 200,
+  duration: '427ms',
+  userAgent: 'PostmanRuntime/7.44.0',
+  ip: '::1',
+  query: {},
+  body: { pseudo: 'testtt', motDePasse: 'mdpSuperSecret' },
+  level: 'info',
+  message: 'API Call Success'
+}
