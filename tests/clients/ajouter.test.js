@@ -19,15 +19,15 @@ describe("ajouter client", () => {
     jest.clearAllMocks();
   });
 
-  it("devrait retourner 400 si pseudo, motDePasse ou roleId manquent", async () => {
-    req.body = { pseudo: "test" }; // motDePasse et roleId manquants
+  it("devrait retourner 400 si pseudo ou motDePasse manquent", async () => {
+    req.body = { pseudo: "test" }; // motDePasse manquant
 
     await clientController.ajouter(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
       success: false,
-      message: "pseudo, motDePasse et roleId sont requis",
+      message: "pseudo, motDePasse sont requis",
     });
     expect(clientsService.createClient).not.toHaveBeenCalled();
   });
@@ -36,7 +36,6 @@ describe("ajouter client", () => {
     req.body = {
       pseudo: "client1",
       motDePasse: "password123",
-      roleId: "2",
       personne: { nom: "Dupont", prenom: "Jean" },
       entreprise: { nom: "EntrepriseX" },
       addresses: [{ rue: "1 rue A", ville: "Paris" }],
@@ -46,7 +45,7 @@ describe("ajouter client", () => {
       id: "uuid-1",
       pseudo: "client1",
       motDePasse: "hashedpassword",
-      roleId: 2,
+      roleId: 1, // car le contrôleur force roleIdDefaut = 1
       personne: req.body.personne,
       entreprise: req.body.entreprise,
       addresses: req.body.addresses,
@@ -56,7 +55,15 @@ describe("ajouter client", () => {
 
     await clientController.ajouter(req, res);
 
-    expect(clientsService.createClient).toHaveBeenCalledWith(req.body);
+    expect(clientsService.createClient).toHaveBeenCalledWith({
+      pseudo: req.body.pseudo,
+      motDePasse: req.body.motDePasse,
+      roleIdDefaut: 1,
+      personne: req.body.personne,
+      entreprise: req.body.entreprise,
+      addresses: req.body.addresses,
+    });
+
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
       success: true,
@@ -69,7 +76,6 @@ describe("ajouter client", () => {
     req.body = {
       pseudo: "client1",
       motDePasse: "password123",
-      roleId: "2",
     };
 
     clientsService.createClient.mockRejectedValue(new Error("Erreur DB"));
