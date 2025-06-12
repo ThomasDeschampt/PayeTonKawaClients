@@ -53,7 +53,7 @@ model EntrepriseDetails {
 
   client         Client   @relation(fields: [clientId], references: [id])
 
-  @@map("entreprise_details")
+  @@map("entreprise_client_details")
 }
 
 model PersonneDetails {
@@ -67,5 +67,5 @@ model PersonneDetails {
 
   client         Client   @relation(fields: [clientId], references: [id])
 
-  @@map("personne_details")
+  @@map("personne_client_details")
 }
