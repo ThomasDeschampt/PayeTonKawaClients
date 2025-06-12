@@ -1,0 +1,46 @@
+name: CI_tests_Build_Clients
+
+on:
+  push:
+    branches:
+      - main # Déclenche le workflow à chaque push sur la branche 'main'
+      - test # Si vous utilisez une branche de développement
+  pull_request:
+    branches:
+      - main # Déclenche pour les Pull Requests ciblant 'main'
+      - test # Si vous utilisez une branche de développement
+
+jobs:
+  build-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: docker build -t payetonkawa-client .
+
+      - name: Run container briefly (sanity check)
+        run: |
+          docker run -d --name app-test -e JWT_SECRET=${{ secrets.JWT_SECRET }} payetonkawa-client
+
+      - name: Show container logs
+        run: docker logs app-test || true
+
+      - name: Check container exit status
+        run: |
+          STATUS=$(docker inspect -f '{{.State.ExitCode}}' app-test)
+          echo "Exit code: $STATUS"
+          if [ "$STATUS" != "0" ]; then
+            echo "❌ L'application a crashé au démarrage."
+            exit 1
+          fi
+
+      - name: Clean up container
+        run: |
+          docker stop app-test
+          docker rm app-test

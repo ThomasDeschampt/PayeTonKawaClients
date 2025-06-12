@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const authorized = require("../middleware/auth");
+const { authorized, authorizedRole, adminOnly } = require("../middleware/auth");
 const validateUUID = require('../middleware/uuidValidation.js');
 
 const clientsController = require("../controllers/clientsController");
@@ -205,7 +205,7 @@ router.get("/afficher/:uuid", authorized, validateUUID, clientsController.affich
  *               success: false
  *               message: "Erreur serveur"
  */
-router.get("/afficherAll", authorized, clientsController.afficherAll);
+router.get("/afficherAll", adminOnly, clientsController.afficherAll);
 
 /**
  * @swagger
