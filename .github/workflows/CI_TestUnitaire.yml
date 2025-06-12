@@ -1,8 +1,8 @@
-name: CI_tests_unitaires_Produits
+name: CI_tests_unitaires_Clients
 
 on:
   workflow_run:
-    workflows: ["CI_tests_Build_Produits"]
+    workflows: ["CI_tests_Build_Clients"]
     types:
       - completed
 jobs:
