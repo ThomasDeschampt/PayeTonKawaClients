@@ -29,7 +29,7 @@ model Client {
   personne     PersonneDetails?
   addresses    Address[]
 
-  @@map("clients")
+  @@map("users")
 }
 
 model Address {
