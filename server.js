@@ -1,18 +1,16 @@
-const express = require("express");
-const cors = require("cors");
+const express = require('express');
+const cors = require('cors');
 const rateLimit = require('express-rate-limit');
-const setupSwagger = require("./swagger");
-const { PrismaClient } = require("@prisma/client");
+const setupSwagger = require('./swagger');
+const { PrismaClient } = require('@prisma/client');
 const { rabbitmq } = require('./services/rabbitmq');
 const { metricsMiddleware, metricsRoute } = require('./middleware/metrics');
 const errorHandler = require('./middleware/error.middleware');
 const config = require('./config');
-require("dotenv").config();
+require('dotenv').config();
 
 const app = express();
 const prisma = new PrismaClient();
-
-console.log('Configuration RabbitMQ:', config.rabbitmq.url);
 
 const limiter = rateLimit({
     windowMs: config.rateLimit.windowMs,
@@ -48,44 +46,7 @@ app.use('*', (req, res) => {
 
 app.use(errorHandler);
 
-async function initializeRabbitMQ() {
-    try {
-        console.log('Tentative de connexion à RabbitMQ avec URL:', config.rabbitmq.url);
-        const connected = await rabbitmq.connect();
-        if (!connected) {
-            console.error('Impossible de se connecter à RabbitMQ');
-            return;
-        }
 
-        await rabbitmq.listenToQueue(config.rabbitmq.queues.produitCreated, (message) => {
-            console.log('Nouveau produit créé:', message);
-        });
-
-        await rabbitmq.listenToQueue(config.rabbitmq.queues.produitUpdated, (message) => {
-            console.log('Produit mis à jour:', message);
-        });
-
-        await rabbitmq.listenToQueue(config.rabbitmq.queues.produitDeleted, (message) => {
-            console.log('Produit supprimé:', message);
-        });
-
-        await rabbitmq.listenToQueue(config.rabbitmq.queues.commandeCreated, (message) => {
-            console.log('Nouvelle commande créée:', message);
-        });
-
-        await rabbitmq.listenToQueue(config.rabbitmq.queues.commandeUpdated, (message) => {
-            console.log('Commande mise à jour:', message);
-        });
-
-        await rabbitmq.listenToQueue(config.rabbitmq.queues.commandeDeleted, (message) => {
-            console.log('Commande supprimée:', message);
-        });
-
-        console.log('RabbitMQ initialisé avec succès');
-    } catch (error) {
-        console.error('Erreur lors de l\'initialisation de RabbitMQ:', error);
-    }
-}
 
 const server = app.listen(config.server.port, async () => {
     console.log(`Serveur démarré sur le port ${config.server.port}`);
@@ -93,14 +54,16 @@ const server = app.listen(config.server.port, async () => {
     console.log('Protection DDoS activée (100 req/15min par IP)');
     console.log('Métriques Prometheus disponibles sur /metrics');
 
-      //temporaire
-  const token = jwt.sign({ username: "testuser" }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
+      const jwt = require('jsonwebtoken');
+
+  //temporaire
+  const token = jwt.sign(
+    { username: 'testuser' },
+    process.env.JWT_SECRET,
+    { expiresIn: '1h' }
+  );
 
   console.log(token);
-
-    await initializeRabbitMQ();
 });
 
 process.on('SIGTERM', async () => {
