@@ -153,9 +153,10 @@ exports.verifierMotDePasse = async (req, res) => {
     }
 
     const payload = {
-      id: resultat.client.id,
-      pseudo: resultat.client.pseudo
-    };
+          id: client.id,
+          pseudo: client.pseudo,
+          role: client.role.name, // <-- rôle ajouté ici
+        };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: '1h' // Token valide pendant 1 heure
