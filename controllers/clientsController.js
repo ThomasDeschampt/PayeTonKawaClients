@@ -1,4 +1,5 @@
 const clientsService = require("../services/clientsService");
+const jwt = require('jsonwebtoken');
 
 exports.afficher = async (req, res) => {
   try {
@@ -151,9 +152,19 @@ exports.verifierMotDePasse = async (req, res) => {
       });
     }
 
+    const payload = {
+      id: resultat.client.id,
+      pseudo: resultat.client.pseudo
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: '1h' // Token valide pendant 1 heure
+    });
+
     return res.json({
       success: true,
       message: "Authentification réussie",
+      token,
       data: resultat.client,
     });
   } catch (error) {
