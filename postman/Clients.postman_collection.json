@@ -15,7 +15,7 @@
 					"jwt": [
 						{
 							"key": "secret",
-							"value": "aa0de9f27dcd9b3b14d71897f22fbf531326d89e560379bfd519da2dffc2b03c26e9247767799ad04d108b575fc9988e8aa8c014414c60724073a84ee6402d66",
+							"value": "Bearer {{jwtToken}}",
 							"type": "string"
 						},
 						{
@@ -58,12 +58,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/api/clients/afficherAll",
+					"raw": "http://localhost:3003/api/clients/afficherAll",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "3000",
+					"port": "3003",
 					"path": [
 						"api",
 						"clients",
@@ -106,6 +106,100 @@
 		},
 		{
 			"name": "Ajouter un client",
+			"event": [
+  {
+    "listen": "test",
+    "script": {
+      "exec": [
+        "pm.test(\"Status code is 200 or 201\", function () {",
+        "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+        "});",
+        "",
+        "pm.test(\"Response 'success' is true\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    pm.expect(jsonData.success).to.be.true;",
+        "});",
+        "",
+        "pm.test(\"Response has success message\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    pm.expect(jsonData.message).to.eql('Client créé avec succès');",
+        "});",
+        "",
+        "pm.test(\"Response has client data\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    pm.expect(jsonData.data).to.be.an('object').that.is.not.empty;",
+        "});",
+        "",
+        "pm.test(\"Client data has required properties\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    var clientData = jsonData.data;",
+        "    pm.expect(clientData).to.have.property('id');",
+        "    pm.expect(clientData).to.have.property('createdAt');",
+        "    pm.expect(clientData).to.have.property('pseudo');",
+        "    pm.expect(clientData).to.have.property('motDePasse');",
+        "    pm.expect(clientData).to.have.property('roleId');",
+        "    pm.expect(clientData).to.have.property('role');",
+        "});",
+        "",
+        "pm.test(\"Client data has optional properties\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    var clientData = jsonData.data;",
+        "    pm.expect(clientData).to.have.property('personne');",
+        "    pm.expect(clientData).to.have.property('entreprise');",
+        "    pm.expect(clientData).to.have.property('addresses');",
+        "});",
+        "",
+        "pm.test(\"Client ID is a valid UUID\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    var uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;",
+        "    pm.expect(jsonData.data.id).to.match(uuidRegex);",
+        "});",
+        "",
+        "pm.test(\"CreatedAt is a valid date\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    var createdAt = new Date(jsonData.data.createdAt);",
+        "    pm.expect(createdAt).to.be.a('date');",
+        "    pm.expect(createdAt.toString()).to.not.equal('Invalid Date');",
+        "});",
+        "",
+        "pm.test(\"Password is hashed (bcrypt format)\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    var bcryptRegex = /^\\$2[aby]?\\$\\d+\\$/;",
+        "    pm.expect(jsonData.data.motDePasse).to.match(bcryptRegex);",
+        "});",
+        "",
+        "pm.test(\"Role object has expected properties\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    var role = jsonData.data.role;",
+        "    pm.expect(role).to.have.property('id');",
+        "    pm.expect(role).to.have.property('name');",
+        "    pm.expect(role.id).to.be.a('number');",
+        "    pm.expect(role.name).to.be.a('string').that.is.not.empty;",
+        "});",
+        "",
+        "pm.test(\"RoleId matches role.id\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    pm.expect(jsonData.data.roleId).to.equal(jsonData.data.role.id);",
+        "});",
+        "",
+        "pm.test(\"Addresses is an array\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    pm.expect(jsonData.data.addresses).to.be.an('array');",
+        "});",
+        "",
+        "// Store the created client UUID for use in other requests",
+        "pm.test(\"Store client UUID in environment\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    if (jsonData.success && jsonData.data && jsonData.data.id) {",
+        "        pm.environment.set('uuid', jsonData.data.id);",
+        "        console.log('Client UUID stored in environment variable: ' + jsonData.data.id);",
+        "    }",
+        "});"
+      ],
+      "type": "text/javascript"
+    }
+  }
+],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -123,7 +217,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"pseudo\": \"alice2025\",\r\n  \"motDePasse\": \"mdpSuperSecret\",\r\n  \"roleId\": 2,\r\n  \"personne\": {\r\n    \"nom\": \"Durand\",\r\n    \"prenom\": \"Alice\",\r\n    \"mail\": \"alice.durand@example.com\",\r\n    \"telephone\": \"0607080910\",\r\n    \"dateNaissance\": \"1988-05-12T00:00:00.000Z\"\r\n  },\r\n  \"entreprise\": {\r\n    \"nomEntreprise\": \"Alice Consulting\",\r\n    \"siret\": \"98765432100015\"\r\n  },\r\n  \"addresses\": [\r\n    {\r\n      \"codePostal\": 75015,\r\n      \"adresse\": \"123 rue de la Paix\",\r\n      \"complement\": \"Bureau 5\"\r\n    }\r\n  ]\r\n}\r\n",
+					"raw": "{\r\n  \"pseudo\": \"amodifier\",\r\n  \"motDePasse\": \"amodifier\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -150,7 +244,7 @@
 					"jwt": [
 						{
 							"key": "secret",
-							"value": "aa0de9f27dcd9b3b14d71897f22fbf531326d89e560379bfd519da2dffc2b03c26e9247767799ad04d108b575fc9988e8aa8c014414c60724073a84ee6402d66",
+							"value": "Bearer {{jwtToken}}",
 							"type": "string"
 						},
 						{
@@ -253,6 +347,106 @@
 					"path": [
 						"supprimer",
 						"{{uuid}}"
+					]
+				}
+			},
+			"response": []
+		},{
+			"name": "Vérifier mot de passe (Login)",
+			"event": [
+  {
+    "listen": "test",
+    "script": {
+      "exec": [
+        "pm.test(\"Status code is 200\", function () {",
+        "    pm.response.to.have.status(200);",
+        "});",
+        "",
+        "pm.test(\"Response 'success' is true\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    pm.expect(jsonData.success).to.be.true;",
+        "});",
+        "",
+        "pm.test(\"Response has authentication message\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    pm.expect(jsonData.message).to.eql('Authentification réussie');",
+        "});",
+        "",
+        "pm.test(\"Response has a valid JWT token\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    pm.expect(jsonData.token).to.be.a('string').that.is.not.empty;",
+        "    pm.expect(jsonData.token.split('.')).to.have.lengthOf(3);",
+        "});",
+        "",
+        "pm.test(\"Response has client data\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    pm.expect(jsonData.data).to.be.an('object').that.is.not.empty;",
+        "});",
+        "",
+        "pm.test(\"Client data has expected properties\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    var clientData = jsonData.data;",
+        "    pm.expect(clientData).to.have.property('id');",
+        "    pm.expect(clientData).to.have.property('createdAt');",
+        "    pm.expect(clientData).to.have.property('pseudo');",
+        "    pm.expect(clientData).to.have.property('motDePasse');",
+        "    pm.expect(clientData).to.have.property('roleId');",
+        "    pm.expect(clientData).to.have.property('role');",
+        "});",
+        "",
+        "pm.test(\"Role object has expected properties\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    var role = jsonData.data.role;",
+        "    pm.expect(role).to.have.property('id');",
+        "    pm.expect(role).to.have.property('name');",
+        "    pm.expect(role.id).to.be.a('number');",
+        "    pm.expect(role.name).to.be.a('string').that.is.not.empty;",
+        "});",
+        "",
+        "pm.test(\"Client ID is a valid UUID\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    var uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;",
+        "    pm.expect(jsonData.data.id).to.match(uuidRegex);",
+        "});",
+        "",
+        "// Store the JWT token in environment variable for use in other requests",
+        "pm.test(\"Store JWT token in environment\", function () {",
+        "    var jsonData = pm.response.json();",
+        "    if (jsonData.success && jsonData.token) {",
+        "        pm.environment.set('jwtToken', jsonData.token);",
+        "        console.log('JWT Token stored in environment variable');",
+        "    }",
+        "});"
+      ],
+      "type": "text/javascript"
+    }
+  }
+],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"pseudo\": \"moi\",\r\n  \"motDePasse\": \"moi\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/verifier",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"verifier"
 					]
 				}
 			},
