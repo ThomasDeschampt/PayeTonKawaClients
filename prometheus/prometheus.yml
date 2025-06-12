@@ -5,7 +5,9 @@ global:
 scrape_configs:
   - job_name: 'api-clients'
     static_configs:
-      - targets: ['api-clients:3003']
+      - targets: 
+        - 'api-produits:3003'
+        - 'host.docker.internal:3003'
     metrics_path: '/metrics'
 
   - job_name: 'rabbitmq'

@@ -27,7 +27,7 @@ function stopDockerServices() {
 // Fonction pour démarrer les services Docker
 function startDockerServices() {
     console.log('Démarrage des services Docker (sans api-clients)...');
-    runCommand('docker compose up -d rabbitmq prometheus');
+    runCommand('docker compose up -d rabbitmq prometheus grafana');
 
     console.log('Construction du conteneur api-client...');
     runCommand('docker compose build payetonkawaclient');

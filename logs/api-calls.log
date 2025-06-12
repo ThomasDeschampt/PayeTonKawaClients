@@ -1,0 +1,216 @@
+{
+  service: 'api-produits',
+  port: 3003,
+  environment: 'development',
+  features: [ 'DDoS Protection', 'Prometheus Metrics', 'Structured Logging' ],
+  level: 'info',
+  message: 'Server started',
+  timestamp: '2025-06-12 10:44:02'
+}
+{
+  service: 'api-produits',
+  api: 'http://localhost:3003/api',
+  metrics: 'http://localhost:3003/metrics',
+  swagger: 'http://localhost:3003/api-docs',
+  level: 'info',
+  message: 'API endpoints available',
+  timestamp: '2025-06-12 10:44:02'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 10:44:21',
+  method: 'GET',
+  url: '/docs-api',
+  route: '/',
+  statusCode: 404,
+  duration: '1ms',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 10:44:24',
+  method: 'GET',
+  url: '/api-docs/',
+  route: '/',
+  statusCode: 304,
+  duration: '3ms',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'info',
+  message: 'API Call Success'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 10:44:24',
+  method: 'GET',
+  url: '/api-docs/swagger-ui.css',
+  route: '/swagger-ui.css',
+  statusCode: 304,
+  duration: '2ms',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'info',
+  message: 'API Call Success'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 10:44:24',
+  method: 'GET',
+  url: '/api-docs/swagger-ui-bundle.js',
+  route: '/swagger-ui-bundle.js',
+  statusCode: 304,
+  duration: '2ms',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'info',
+  message: 'API Call Success'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 10:44:24',
+  method: 'GET',
+  url: '/api-docs/swagger-ui-init.js',
+  route: '/swagger-ui-init.js',
+  statusCode: 304,
+  duration: '0ms',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'info',
+  message: 'API Call Success'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 10:44:24',
+  method: 'GET',
+  url: '/api-docs/swagger-ui-standalone-preset.js',
+  route: '/swagger-ui-standalone-preset.js',
+  statusCode: 304,
+  duration: '3ms',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'info',
+  message: 'API Call Success'
+}
+{
+  service: 'api-produits',
+  port: 3003,
+  environment: 'development',
+  features: [ 'DDoS Protection', 'Prometheus Metrics', 'Structured Logging' ],
+  level: 'info',
+  message: 'Server started',
+  timestamp: '2025-06-12 10:48:54'
+}
+{
+  service: 'api-produits',
+  api: 'http://localhost:3003/api',
+  metrics: 'http://localhost:3003/metrics',
+  swagger: 'http://localhost:3003/api-docs',
+  level: 'info',
+  message: 'API endpoints available',
+  timestamp: '2025-06-12 10:48:54'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 10:49:11',
+  method: 'GET',
+  url: '/api-docs/',
+  route: '/',
+  statusCode: 304,
+  duration: '4ms',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'info',
+  message: 'API Call Success'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 10:49:11',
+  method: 'GET',
+  url: '/api-docs/swagger-ui.css',
+  route: '/swagger-ui.css',
+  statusCode: 304,
+  duration: '2ms',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'info',
+  message: 'API Call Success'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 10:49:11',
+  method: 'GET',
+  url: '/api-docs/swagger-ui-init.js',
+  route: '/swagger-ui-init.js',
+  statusCode: 304,
+  duration: '0ms',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'info',
+  message: 'API Call Success'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 10:49:11',
+  method: 'GET',
+  url: '/api-docs/swagger-ui-bundle.js',
+  route: '/swagger-ui-bundle.js',
+  statusCode: 304,
+  duration: '3ms',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'info',
+  message: 'API Call Success'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 10:49:11',
+  method: 'GET',
+  url: '/api-docs/swagger-ui-standalone-preset.js',
+  route: '/swagger-ui-standalone-preset.js',
+  statusCode: 304,
+  duration: '4ms',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'info',
+  message: 'API Call Success'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-12 10:49:12',
+  method: 'GET',
+  url: '/api-docs/favicon-32x32.png',
+  route: '/favicon-32x32.png',
+  statusCode: 200,
+  duration: '3ms',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0',
+  ip: '::1',
+  query: {},
+  body: undefined,
+  level: 'info',
+  message: 'API Call Success'
+}

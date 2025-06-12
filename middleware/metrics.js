@@ -1,65 +1,62 @@
-const prometheus = require('prom-client');
+const { 
+  httpRequestsTotal, 
+  httpRequestDuration, 
+  httpRequestExceptions,
+  register 
+} = require('../metrics');
+const logger = require('../utils/logger');
 
-const register = new prometheus.Registry();
-
-prometheus.collectDefaultMetrics({
-    app: 'api-clients',
-    prefix: 'api_clients_',
-    timeout: 10000,
-    register
-});
-
-const httpRequestDurationMicroseconds = new prometheus.Histogram({
-    name: 'http_request_duration_seconds',
-    help: 'Durée des requêtes HTTP en secondes',
-    labelNames: ['method', 'route', 'status_code'],
-    buckets: [0.1, 0.5, 1, 2, 5]
-});
-
-const httpRequestsTotal = new prometheus.Counter({
-    name: 'http_requests_total',
-    help: 'Nombre total de requêtes HTTP',
-    labelNames: ['method', 'route', 'status_code']
-});
-
-const activeConnections = new prometheus.Gauge({
-    name: 'active_connections',
-    help: 'Number of active connections'
-});
-
-register.registerMetric(httpRequestDurationMicroseconds);
-register.registerMetric(httpRequestsTotal);
-register.registerMetric(activeConnections);
-
+// Middleware pour capturer les métriques HTTP + logs
 const metricsMiddleware = (req, res, next) => {
-    const start = Date.now();
+  const startTime = Date.now();
+  
+  res.on('finish', () => {
+    const duration = Date.now() - startTime;
+    const route = req.route ? req.route.path : req.path;
     
-    res.on('finish', () => {
-        const duration = Date.now() - start;
-        const route = req.route ? req.route.path : 'unknown';
-        
-        httpRequestDurationMicroseconds
-            .labels(req.method, route, res.statusCode.toString())
-            .observe(duration / 1000);
-            
-        httpRequestsTotal
-            .labels(req.method, route, res.statusCode.toString())
-            .inc();
+    httpRequestsTotal.inc({
+      method: req.method,
+      route: route,
+      status_code: res.statusCode
     });
     
-    next();
+    httpRequestDuration.observe({
+      method: req.method,
+      route: route,
+      status_code: res.statusCode
+    }, duration / 1000);
+
+    if (!req.path.includes('/metrics') && !req.path.includes('/health')) {
+      logger.logApiCall(req, res, duration);
+    }
+  });
+  
+  next();
+};
+
+// Middleware pour capturer les exceptions
+const errorMetricsMiddleware = (err, req, res, next) => {
+  const route = req.route ? req.route.path : req.path;
+  
+  httpRequestExceptions.inc({
+    method: req.method,
+    route: route,
+    exception_type: err.name || 'UnknownError'
+  });
+
+  const duration = Date.now() - (req.startTime || Date.now());
+  logger.logApiCall(req, res, duration, err);
+  
+  next(err);
 };
 
 const metricsRoute = async (req, res) => {
-    res.set('Content-Type', prometheus.register.contentType);
-    res.end(await prometheus.register.metrics());
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
 };
 
 module.exports = {
-    metricsMiddleware,
-    metricsRoute,
-    register,
-    httpRequestDurationMicroseconds,
-    httpRequestsTotal,
-    activeConnections
-}; 
+  metricsMiddleware,
+  errorMetricsMiddleware,
+  metricsRoute
+};

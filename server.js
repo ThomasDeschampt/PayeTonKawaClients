@@ -4,10 +4,11 @@ const rateLimit = require('express-rate-limit');
 const setupSwagger = require('./swagger');
 const { PrismaClient } = require('@prisma/client');
 const { rabbitmq } = require('./services/rabbitmq');
-const { metricsMiddleware, metricsRoute } = require('./middleware/metrics');
+const { metricsMiddleware, errorMetricsMiddleware, metricsRoute } = require('./middleware/metrics');
 const errorHandler = require('./middleware/error.middleware');
 const config = require('./config');
 require('dotenv').config();
+const logger = require('./utils/logger');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -44,15 +45,24 @@ app.use('*', (req, res) => {
     });
 });
 
+app.use(errorMetricsMiddleware); 
 app.use(errorHandler);
 
 
 
 const server = app.listen(config.server.port, async () => {
-    console.log(`Serveur démarré sur le port ${config.server.port}`);
-    console.log(`API disponible sur http://localhost:${config.server.port}/api`);
-    console.log('Protection DDoS activée (100 req/15min par IP)');
-    console.log('Métriques Prometheus disponibles sur /metrics');
+    logger.info('Server started', {
+        port: config.server.port,
+        environment: process.env.NODE_ENV || 'development',
+        features: ['DDoS Protection', 'Prometheus Metrics', 'Structured Logging']
+    });
+    
+    // Logs au lieu de console.log
+    logger.info('API endpoints available', {
+        api: `http://localhost:${config.server.port}/api`,
+        metrics: `http://localhost:${config.server.port}/metrics`,
+        swagger: `http://localhost:${config.server.port}/api-docs`
+    });
 
       const jwt = require('jsonwebtoken');
 
