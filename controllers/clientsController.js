@@ -37,19 +37,21 @@ exports.afficherAll = async (req, res) => {
 
 exports.ajouter = async (req, res) => {
   try {
-    const { pseudo, motDePasse, roleId, personne, entreprise, addresses } = req.body;
+    const { pseudo, motDePasse, personne, entreprise, addresses } = req.body;
 
-    if (!pseudo || !motDePasse || !roleId) {
+    if (!pseudo || !motDePasse) {
       return res.status(400).json({
         success: false,
-        message: "pseudo, motDePasse et roleId sont requis",
+        message: "pseudo, motDePasse sont requis",
       });
     }
+
+    const roleIdDefaut = 1;
 
     const nouveauClient = await clientsService.createClient({
       pseudo,
       motDePasse,
-      roleId,
+      roleIdDefaut,
       personne,
       entreprise,
       addresses,
