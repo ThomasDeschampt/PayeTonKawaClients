@@ -1,4 +1,5 @@
 const clientsService = require("../services/clientsService");
+const rabbitmq = require("../services/rabbitmqService");
 const jwt = require('jsonwebtoken');
 
 exports.afficher = async (req, res) => {
@@ -57,6 +58,8 @@ exports.ajouter = async (req, res) => {
       addresses,
     });
 
+    await rabbitmq.publishClientCreated(nouveauClient);
+
     res.status(201).json({
       success: true,
       data: nouveauClient,
@@ -76,7 +79,6 @@ exports.modifier = async (req, res) => {
     const { uuid } = req.params;
     const { pseudo, motDePasse, roleId } = req.body;
 
-    // Vérifier que le client existe avant update
     const clientExistant = await clientsService.getClientById(uuid);
 
     if (!clientExistant) {
@@ -91,6 +93,8 @@ exports.modifier = async (req, res) => {
       motDePasse,
       roleId,
     });
+
+    await rabbitmq.publishClientUpdated(clientMisAJour);
 
     res.json({
       success: true,
@@ -110,7 +114,6 @@ exports.supprimer = async (req, res) => {
   try {
     const { uuid } = req.params;
 
-    // Vérifier que le client existe
     const clientExistant = await clientsService.getClientById(uuid);
     if (!clientExistant) {
       return res.status(404).json({
@@ -120,6 +123,8 @@ exports.supprimer = async (req, res) => {
     }
 
     await clientsService.deleteClient(uuid);
+
+    await rabbitmq.publishClientDeleted(uuid);
 
     res.json({
       success: true,
@@ -163,7 +168,7 @@ exports.verifierMotDePasse = async (req, res) => {
         };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: '1h' // Token valide pendant 1 heure
+      expiresIn: '1h' 
     });
 
     return res.json({
