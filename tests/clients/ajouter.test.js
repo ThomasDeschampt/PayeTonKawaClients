@@ -1,8 +1,13 @@
 const clientController = require("../../controllers/clientsController");
 const clientsService = require("../../services/clientsService");
+const rabbitmqService = require("../../services/rabbitmqService");
 
 jest.mock("../../services/clientsService", () => ({
   createClient: jest.fn(),
+}));
+
+jest.mock("../../services/rabbitmqService", () => ({
+  publishClientCreated: jest.fn().mockResolvedValue(undefined),
 }));
 
 describe("ajouter client", () => {
@@ -30,6 +35,7 @@ describe("ajouter client", () => {
       message: "pseudo, motDePasse sont requis",
     });
     expect(clientsService.createClient).not.toHaveBeenCalled();
+    expect(rabbitmqService.publishClientCreated).not.toHaveBeenCalled();
   });
 
   it("devrait appeler createClient et retourner le client créé", async () => {
@@ -64,6 +70,8 @@ describe("ajouter client", () => {
       addresses: req.body.addresses,
     });
 
+    expect(rabbitmqService.publishClientCreated).toHaveBeenCalledWith(createdClient);
+
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
       success: true,
@@ -87,5 +95,6 @@ describe("ajouter client", () => {
       success: false,
       message: "Erreur serveur",
     });
+    expect(rabbitmqService.publishClientCreated).not.toHaveBeenCalled();
   });
 });

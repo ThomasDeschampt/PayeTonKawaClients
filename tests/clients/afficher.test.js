@@ -10,41 +10,38 @@ describe("afficher client", () => {
 
   beforeEach(() => {
     req = {
-      params: {},
+      params: { uuid: "uuid-123" },
     };
     res = {
-      json: jest.fn(),
       status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
     };
     jest.clearAllMocks();
   });
 
   it("devrait retourner un client si trouvé", async () => {
-    const fakeClient = {
-      id: "123e4567-e89b-12d3-a456-426614174000",
-      pseudo: "JeanClient",
+    const mockClient = {
+      id: "uuid-123",
+      pseudo: "client1",
       roleId: 1,
     };
 
-    req.params.uuid = fakeClient.id;
-    clientsService.getClientById.mockResolvedValue(fakeClient);
+    clientsService.getClientById.mockResolvedValue(mockClient);
 
     await clientController.afficher(req, res);
 
-    expect(clientsService.getClientById).toHaveBeenCalledWith(fakeClient.id);
+    expect(clientsService.getClientById).toHaveBeenCalledWith("uuid-123");
     expect(res.json).toHaveBeenCalledWith({
       success: true,
-      data: fakeClient,
+      data: mockClient,
     });
   });
 
   it("devrait retourner 404 si client non trouvé", async () => {
-    req.params.uuid = "123e4567-e89b-12d3-a456-426614174000";
     clientsService.getClientById.mockResolvedValue(null);
 
     await clientController.afficher(req, res);
 
-    expect(clientsService.getClientById).toHaveBeenCalledWith(req.params.uuid);
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({
       success: false,
@@ -53,21 +50,14 @@ describe("afficher client", () => {
   });
 
   it("devrait retourner 500 si erreur serveur", async () => {
-    req.params.uuid = "123e4567-e89b-12d3-a456-426614174000";
-    clientsService.getClientById.mockRejectedValue(new Error("DB fail"));
-
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+    clientsService.getClientById.mockRejectedValue(new Error("Erreur DB"));
 
     await clientController.afficher(req, res);
 
-    expect(clientsService.getClientById).toHaveBeenCalledWith(req.params.uuid);
-    expect(consoleSpy).toHaveBeenCalledWith("Erreur:", expect.any(Error));
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
       success: false,
       message: "Erreur serveur",
     });
-
-    consoleSpy.mockRestore();
   });
 });

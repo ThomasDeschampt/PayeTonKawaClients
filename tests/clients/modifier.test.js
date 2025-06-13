@@ -1,10 +1,15 @@
 const clientController = require("../../controllers/clientsController");
 const clientsService = require("../../services/clientsService");
+const rabbitmqService = require("../../services/rabbitmqService");
 
 // Mock du service
 jest.mock("../../services/clientsService", () => ({
   getClientById: jest.fn(),
   updateClient: jest.fn(),
+}));
+
+jest.mock("../../services/rabbitmqService", () => ({
+  publishClientUpdated: jest.fn().mockResolvedValue(undefined),
 }));
 
 describe("modifier client", () => {
@@ -48,6 +53,8 @@ describe("modifier client", () => {
       roleId: "3",
     });
 
+    expect(rabbitmqService.publishClientUpdated).toHaveBeenCalledWith(updatedClient);
+
     expect(res.json).toHaveBeenCalledWith({
       success: true,
       message: "Client mis à jour avec succès",
@@ -69,7 +76,21 @@ describe("modifier client", () => {
     });
   });
 
-  it("devrait gérer une erreur serveur", async () => {
+  it("devrait gérer une erreur serveur lors de la récupération du client", async () => {
+    clientsService.getClientById.mockRejectedValue(new Error("Erreur DB"));
+
+    await clientController.modifier(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      message: "Erreur serveur",
+    });
+    expect(clientsService.updateClient).not.toHaveBeenCalled();
+    expect(rabbitmqService.publishClientUpdated).not.toHaveBeenCalled();
+  });
+
+  it("devrait gérer une erreur serveur lors de la mise à jour", async () => {
     clientsService.getClientById.mockResolvedValue({ id: req.params.uuid });
     clientsService.updateClient.mockRejectedValue(new Error("Erreur DB"));
 
@@ -80,5 +101,6 @@ describe("modifier client", () => {
       success: false,
       message: "Erreur serveur",
     });
+    expect(rabbitmqService.publishClientUpdated).not.toHaveBeenCalled();
   });
 });
