@@ -1,23 +1,25 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-RUN apk add --no-cache \
-    openssl \
-    libc6-compat \
-    openssl-dev \
-    python3 \
-    make \
-    g++
-
+# Copier les fichiers de dépendances
 COPY package*.json ./
+COPY prisma ./prisma/
 
-RUN npm install
+# Installer les dépendances
+RUN npm install --production=false
 
-COPY . .
-
+# Générer Prisma
 RUN npx prisma generate
 
-EXPOSE 3003
+# Copier le reste des fichiers
+COPY . .
 
-CMD ["npm", "run", "dev"] 
+# Créer le dossier logs
+RUN mkdir -p logs
+
+# Exposer le port
+EXPOSE 3001
+
+# Commande de démarrage
+CMD ["npm", "start"] 
