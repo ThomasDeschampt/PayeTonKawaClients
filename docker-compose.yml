@@ -7,7 +7,7 @@ services:
       - "3003:3003"
     environment:
       - NODE_ENV=development
-      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:4003
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - DEBUG=*
       - PORT=3003
     volumes:
