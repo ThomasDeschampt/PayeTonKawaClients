@@ -96,3 +96,9 @@ exports.verifierMotDePasse = async (pseudo, motDePasse) => {
     client
   };
 };
+
+exports.deleteClient = async (id) => {
+  return await prisma.client.delete({
+    where: { id },
+  });
+};

@@ -39,7 +39,7 @@ model Address {
   complement  String?  @db.VarChar()
   clientId    String
 
-  client      Client   @relation(fields: [clientId], references: [id])
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([clientId])
   @@map("addresses")
@@ -51,7 +51,7 @@ model EntrepriseDetails {
   siret          String   @unique @db.VarChar()
   clientId       String   @unique
 
-  client         Client   @relation(fields: [clientId], references: [id])
+  client         Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("entreprise_client_details")
 }
@@ -65,7 +65,7 @@ model PersonneDetails {
   dateNaissance  DateTime @db.Timestamptz(6)
   clientId       String   @unique
 
-  client         Client   @relation(fields: [clientId], references: [id])
+  client         Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("personne_client_details")
 }
