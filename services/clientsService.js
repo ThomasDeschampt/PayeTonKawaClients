@@ -1,6 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const bcrypt = require("bcrypt");
 
 exports.getClientById = async (id) => {
   return await prisma.client.findUnique({
@@ -29,12 +28,11 @@ exports.getAllClients = async () => {
 };
 
 exports.createClient = async ({ pseudo, motDePasse, roleIdDefaut, personne, entreprise, addresses }) => {
-  const hashedPassword = await bcrypt.hash(motDePasse, 10);
 
   return await prisma.client.create({
     data: {
       pseudo,
-      motDePasse: hashedPassword,
+      motDePasse: motDePasse,
       role: { connect: { id: roleIdDefaut } },
       personne: personne ? { create: personne } : undefined,
       entreprise: entreprise ? { create: entreprise } : undefined,
@@ -44,7 +42,7 @@ exports.createClient = async ({ pseudo, motDePasse, roleIdDefaut, personne, entr
       personne: true,
       entreprise: true,
       addresses: true,
-      role: true, // ← Incluez le rôle dans la réponse
+      role: true,
     },
   });
 };
@@ -57,7 +55,7 @@ exports.updateClient = async (id, { pseudo, motDePasse, roleId }) => {
   }
 
   if (motDePasse !== undefined && motDePasse !== "") {
-    dataToUpdate.motDePasse = await bcrypt.hash(motDePasse, 10);
+    dataToUpdate.motDePasse = motDePasse;
   }
 
   if (roleId !== undefined && roleId !== "") {
@@ -85,9 +83,7 @@ exports.verifierMotDePasse = async (pseudo, motDePasse) => {
     return { success: false, message: "Pseudo incorrect" };
   }
 
-  const isPasswordValid = await bcrypt.compare(motDePasse, client.motDePasse);
-
-  if (!isPasswordValid) {
+  if (client.motDePasse !== motDePasse) {
     return { success: false, message: "Mot de passe incorrect" };
   }
 
