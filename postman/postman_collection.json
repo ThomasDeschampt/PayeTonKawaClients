@@ -114,7 +114,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"pseudo\": \"test\",\r\n  \"motDePasse\": \"test\"\r\n}\r\n",
+						"raw": "{\r\n  \"pseudo\": \"teste\",\r\n  \"motDePasse\": \"test\",\r\n  \"personne\": {\r\n    \"nom\": \"Hello\",\r\n    \"prenom\": \"Grand\",\r\n    \"mail\": \"azerty@gmail.com\",\r\n    \"telephone\": \"041415161\",\r\n    \"dateNaissance\": \"2000-12-14T00:00:00.000Z\"\r\n  },\r\n  \"entreprise\": {\r\n    \"nomEntreprise\": \"PayeTonKawa\",\r\n    \"siret\": \"1456695223655\"\r\n  },\r\n  \"addresses\": []\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -394,7 +394,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"motDePasse\": \"no123\",\r\n  \"roleId\": 2\r\n}\r\n",
+					"raw": "{\r\n  \"pseudo\": \"teste\",\r\n  \"motDePasse\": \"tessst\",\r\n  \"personne\": {\r\n    \"nom\": \"Helloooo\",\r\n    \"prenom\": \"Graddend\",\r\n    \"mail\": \"azerty@gmail.com\",\r\n    \"telephone\": \"041415161\",\r\n    \"dateNaissance\": \"2000-12-14T00:00:00.000Z\"\r\n  },\r\n  \"entreprise\": {\r\n    \"nomEntreprise\": \"PayeTonKawa\",\r\n    \"siret\": \"1456695223655\"\r\n  },\r\n  \"addresses\": []\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
