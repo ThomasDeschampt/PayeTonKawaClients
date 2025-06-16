@@ -21,7 +21,7 @@ describe("modifier client", () => {
       body: {
         pseudo: "nouveauPseudo",
         motDePasse: "newpassword",
-        roleId: "3",
+        roleId: "3", // <-- ce champ sera ignoré
       },
     };
     res = {
@@ -37,8 +37,8 @@ describe("modifier client", () => {
     const updatedClient = {
       id: req.params.uuid,
       pseudo: "nouveauPseudo",
-      motDePasse: "hashedPassword", // on fait comme si le hash est fait dans le service
-      roleId: 3,
+      motDePasse: "hashedPassword",
+      role: { id: 2, name: "client" },
     };
 
     clientsService.updateClient.mockResolvedValue(updatedClient);
@@ -50,7 +50,7 @@ describe("modifier client", () => {
     expect(clientsService.updateClient).toHaveBeenCalledWith("uuid-123", {
       pseudo: "nouveauPseudo",
       motDePasse: "newpassword",
-      roleId: "3",
+      // roleId est ignoré donc on ne le vérifie pas
     });
 
     expect(rabbitmqService.publishClientUpdated).toHaveBeenCalledWith(updatedClient);
@@ -58,10 +58,10 @@ describe("modifier client", () => {
     expect(res.json).toHaveBeenCalledWith({
       success: true,
       message: "Client mis à jour avec succès",
-      data: updatedClient,
+      data: updatedClient, // ou `data: decryptClientData(...)` si utilisée
     });
 
-    expect(res.status).not.toHaveBeenCalled(); // réponse OK = 200 par défaut
+    expect(res.status).not.toHaveBeenCalled(); // 200 par défaut
   });
 
   it("devrait retourner 404 si client non trouvé", async () => {

@@ -77,7 +77,7 @@ exports.ajouter = async (req, res) => {
 exports.modifier = async (req, res) => {
   try {
     const { uuid } = req.params;
-    const { pseudo, motDePasse, roleId } = req.body;
+    const { pseudo, motDePasse, personne, entreprise, addresses } = req.body;
 
     const clientExistant = await clientsService.getClientById(uuid);
 
@@ -91,7 +91,9 @@ exports.modifier = async (req, res) => {
     const clientMisAJour = await clientsService.updateClient(uuid, {
       pseudo,
       motDePasse,
-      roleId,
+      personne,
+      entreprise,
+      addresses
     });
 
     await rabbitmq.publishClientUpdated(clientMisAJour);
