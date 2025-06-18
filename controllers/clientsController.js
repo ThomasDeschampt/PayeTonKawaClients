@@ -1,7 +1,7 @@
 const clientsService = require("../services/clientsService");
 const rabbitmq = require("../services/rabbitmqService");
 const jwt = require('jsonwebtoken');
-const { messagesSent, messagesReceived } = require('../../metrics');
+const { messagesSent, messagesReceived } = require('../metrics');
 
 exports.afficher = async (req, res) => {
   try {
