@@ -1,6 +1,7 @@
 const clientsService = require("../services/clientsService");
 const rabbitmq = require("../services/rabbitmqService");
 const jwt = require('jsonwebtoken');
+const { messagesSent, messagesReceived } = require('../../metrics');
 
 exports.afficher = async (req, res) => {
   try {
@@ -59,6 +60,7 @@ exports.ajouter = async (req, res) => {
     });
 
     await rabbitmq.publishClientCreated(nouveauClient);
+    messagesSent.inc({ queue: 'client.created' });
 
     res.status(201).json({
       success: true,
@@ -97,6 +99,7 @@ exports.modifier = async (req, res) => {
     });
 
     await rabbitmq.publishClientUpdated(clientMisAJour);
+    messagesSent.inc({ queue: 'client.updated' });
 
     res.json({
       success: true,
@@ -127,6 +130,7 @@ exports.supprimer = async (req, res) => {
     await clientsService.deleteClient(uuid);
 
     await rabbitmq.publishClientDeleted(uuid);
+    messagesSent.inc({ queue: 'client.deleted' });
 
     res.json({
       success: true,

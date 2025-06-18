@@ -9,11 +9,12 @@ services:
       - .env
     environment:
       - NODE_ENV=development
+      - DATABASE_URL=process.env.DATABASE_URL
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - DEBUG=*
       - PORT=3003
     depends_on:
-      rabbitmq:
+      rabbitmq_remote:
         condition: service_healthy
     restart: unless-stopped
     networks:
@@ -29,40 +30,17 @@ services:
       - "prometheus.io/port=3003"
       - "prometheus.io/path=/metrics"
 
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    hostname: rabbitmq
-    ports:
-      - "4003:5672"   
-      - "15675:15672" 
-    environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=admin
-      - RABBITMQ_ERLANG_COOKIE=secret_cookie
-      - RABBITMQ_LOGS=- 
-      - RABBITMQ_SASL_LOGS=-
-      - RABBITMQ_USE_LONGNAME=false
-      - RABBITMQ_NODENAME=rabbit@localhost
-      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbitmq_management listener [{port,15672},{ssl,false}]
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
+  rabbitmq_remote:
+    image: busybox
+    command: sh -c "sleep 30"
     networks:
       - my-ipv6-net
     healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
+      test: ["CMD", "wget", "--spider", "--quiet", "http://rabbitmq:15672"]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 30s
-    labels:
-      - "prometheus.io/scrape=true"
-      - "prometheus.io/port=15692"
-      - "prometheus.io/path=/metrics"
-    restart: unless-stopped
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
+      retries: 3
+      start_period: 10s
 
   prometheus:
     image: prom/prometheus:latest
@@ -105,11 +83,10 @@ services:
       retries: 3
       start_period: 30s
 
-volumes:
-  rabbitmq_data:
-  prometheus_data:
-  grafana_data:
-
 networks:
   my-ipv6-net:
     external: true
+
+volumes:
+  prometheus_data:
+  grafana_data:

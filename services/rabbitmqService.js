@@ -1,7 +1,8 @@
 const amqp = require('amqplib');
 require('dotenv').config();
+const { messagesSent, messagesReceived } = require('../metrics');
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:4003';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:4001';
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 
@@ -90,6 +91,7 @@ class RabbitMQService {
                     try {
                         const content = JSON.parse(msg.content.toString());
                         console.log('Received product created message:', content);
+                        messagesSent.inc({ queue: 'product.created' });
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing product created message:', error);
@@ -103,6 +105,7 @@ class RabbitMQService {
                     try {
                         const content = JSON.parse(msg.content.toString());
                         console.log('Received product updated message:', content);
+                        messagesSent.inc({ queue: 'product.updated' });
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing product updated message:', error);
@@ -116,6 +119,7 @@ class RabbitMQService {
                     try {
                         const content = JSON.parse(msg.content.toString());
                         console.log('Received product deleted message:', content);
+                        messagesSent.inc({ queue: 'product.deleted' });
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing product deleted message:', error);
@@ -130,6 +134,7 @@ class RabbitMQService {
                     try {
                         const content = JSON.parse(msg.content.toString());
                         console.log('Received order created message:', content);
+                        messagesSent.inc({ queue: 'order.created' });
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing order created message:', error);
@@ -143,6 +148,7 @@ class RabbitMQService {
                     try {
                         const content = JSON.parse(msg.content.toString());
                         console.log('Received order updated message:', content);
+                        messagesSent.inc({ queue: 'order.updated' });
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing order updated message:', error);
@@ -156,6 +162,7 @@ class RabbitMQService {
                     try {
                         const content = JSON.parse(msg.content.toString());
                         console.log('Received order deleted message:', content);
+                        messagesSent.inc({ queue: 'order.deleted' });
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing order deleted message:', error);
@@ -169,6 +176,7 @@ class RabbitMQService {
                     try {
                         const content = JSON.parse(msg.content.toString());
                         console.log('Received order status changed message:', content);
+                        messagesSent.inc({ queue: 'order.status.changed' });
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing order status changed message:', error);
@@ -183,6 +191,7 @@ class RabbitMQService {
                     try {
                         const content = JSON.parse(msg.content.toString());
                         console.log('Received client created message:', content);
+                        messagesSent.inc({ queue: 'client.created' });
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing client created message:', error);
@@ -196,6 +205,7 @@ class RabbitMQService {
                     try {
                         const content = JSON.parse(msg.content.toString());
                         console.log('Received client updated message:', content);
+                        messagesSent.inc({ queue: 'client.updated' });
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing client updated message:', error);
@@ -209,6 +219,7 @@ class RabbitMQService {
                     try {
                         const content = JSON.parse(msg.content.toString());
                         console.log('Received client deleted message:', content);
+                        messagesSent.inc({ queue: 'client.deleted' });
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing client deleted message:', error);
