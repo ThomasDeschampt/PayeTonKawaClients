@@ -1,35 +1,79 @@
-# PayeTonKawaClients test
+# PayeTonKawa - Service Clients 
 
-## Lancement du projet avec Docker
+Service de gestion des clients pour l'application PayeTonKawa.
 
-Assurez-vous d'avoir Docker et Docker Compose installés sur votre machine.
+## Fonctionnalités
 
-Dans le dossier du projet, lancez :
+- Gestion complète des clients (CRUD)
+- API RESTful documentée avec Swagger
+- Monitoring avec Prometheus
+- Communication asynchrone avec RabbitMQ
+- Protection contre les attaques DDoS
+- Tests automatisés
 
+## Prérequis
+
+- Node.js (v14 ou supérieur)
+- Docker et Docker Compose
+- RabbitMQ
+- PostgreSQL
+
+## 🔧 Installation
+
+1. Cloner le repository :
+```bash
+git clone [URL_DU_REPO]
+cd PayeTonKawaProduits
+```
+
+2. Installer les dépendances :
+```bash
+npm install
+```
+
+3. Configurer les variables d'environnement :
+```bash
+cp .env.example .env
+# Éditer le fichier .env avec vos configurations
+```
+
+4. Démarrer les services avec Docker Compose :
 ```bash
 docker-compose up -d
 ```
 
-## Services et ports utilisés
+## Démarrage
 
-- **API Clients** : [http://localhost:3003](http://localhost:3003)
-- **RabbitMQ (service)** : `localhost:5673`
-- **RabbitMQ (interface web)** : [http://localhost:15673](http://localhost:15673)
-  - Utilisateur : `admin`
-  - Mot de passe : `admin`
-- **Prometheus** : [http://localhost:9091](http://localhost:9091)
-- **Grafana** : [http://localhost:7071](http://localhost:7071)
-  - Utilisateur : `admin`
-  - Mot de passe : `admin`
-
-## Arrêter les conteneurs
-
+### Développement
 ```bash
-docker-compose down
+npm run dev
 ```
 
-## Remarques
+### Production
+```bash
+npm start
+```
 
-- Les ports ont été adaptés pour éviter les conflits avec d'autres services similaires.
-- Si un port est déjà utilisé, modifiez-le dans le fichier `docker-compose.yml`.
+## Documentation API
 
+La documentation Swagger est disponible à l'adresse : `http://localhost:3003/api-docs`
+
+## Tests
+
+```bash
+# Tests unitaires
+npm run test
+
+# Tests avec couverture
+npm run test:coverage
+```
+
+## Monitoring
+- Métriques Prometheus : `http://localhost:9090`
+
+## Sécurité
+
+- Rate limiting : 100 requêtes par IP toutes les 15 minutes
+- Validation des données
+- Protection CORS
+- Gestion des erreurs sécurisée
