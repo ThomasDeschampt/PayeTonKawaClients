@@ -10,9 +10,6 @@ services:
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - DEBUG=*
       - PORT=3003
-    depends_on:
-      rabbitmq_remote:
-        condition: service_healthy
     restart: unless-stopped
     networks:
       - my-ipv6-net
@@ -30,18 +27,6 @@ services:
       - "prometheus.io/scrape=true"
       - "prometheus.io/port=3003"
       - "prometheus.io/path=/metrics"
-
-  rabbitmq_remote:
-    image: busybox
-    command: sh -c "sleep 30"
-    networks:
-      - my-ipv6-net
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "--quiet", "http://rabbitmq:15672"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
 
   prometheus:
     image: prom/prometheus:latest
