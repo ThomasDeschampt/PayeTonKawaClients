@@ -128,21 +128,6 @@ class RabbitMQService {
                 }
             });
 
-            // Consommation des messages commandes
-            await this.channel.consume(this.queues.orderCreated, async (msg) => {
-                if (msg !== null) {
-                    try {
-                        const content = JSON.parse(msg.content.toString());
-                        console.log('Received order created message:', content);
-                        messagesSent.inc({ queue: 'order.created' });
-                        this.channel.ack(msg);
-                    } catch (error) {
-                        console.error('Error processing order created message:', error);
-                        this.channel.nack(msg, false, false);
-                    }
-                }
-            });
-
             await this.channel.consume(this.queues.orderUpdated, async (msg) => {
                 if (msg !== null) {
                     try {
