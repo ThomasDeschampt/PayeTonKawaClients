@@ -16,7 +16,7 @@ function encrypt_v2(text) {
 }
 
 function decrypt_v2(text) {
-  const [ivHex, authTagHex, encrypted] = data.split(':');
+  const [ivHex, authTagHex, encrypted] = text.split(':');
 
   const iv = Buffer.from(ivHex, 'hex');
   const authTag = Buffer.from(authTagHex, 'hex');
